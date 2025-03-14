@@ -1,0 +1,11 @@
+storybook-static/*
+
+/dist
+/node_modules
+/safari-dev
+/safari-prod
+
+npm-debug.log
+yarn-error.log
+
+.DS_Store

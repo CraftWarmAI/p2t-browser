@@ -1,0 +1,323 @@
+import React, { useState, useEffect, useRef } from "react";
+import { Button } from "antd";
+import { CloseOutlined, CheckOutlined } from "@ant-design/icons";
+import browser from "webextension-polyfill";
+import styles from "./component.less";
+import Mousetrap from "mousetrap";
+
+interface SelectionArea {
+    startX: number;
+    startY: number;
+    width: number;
+    height: number;
+}
+
+const LatexOcr: React.FC = () => {
+    const [isSelecting, setIsSelecting] = useState<boolean>(false);
+    const [selection, setSelection] = useState<SelectionArea | null>(null);
+    const [isDragging, setIsDragging] = useState<boolean>(false);
+    const [isResizing, setIsResizing] = useState<boolean>(false);
+    const [resizeDirection, setResizeDirection] = useState<string>("");
+    const [startPoint, setStartPoint] = useState<{ x: number; y: number } | null>(null);
+    const [isDown, setIsDown] = useState<boolean>(false);
+    const overlayRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        Mousetrap.bind(["ctrl+k", "command+k"], () => {
+            setIsSelecting(true);
+        });
+
+        Mousetrap.bind("esc", () => {
+            resetSelection();
+        });
+
+        return () => {
+            Mousetrap.unbind(["ctrl+k", "command+k"]);
+            Mousetrap.unbind("esc");
+        };
+    }, []);
+
+    const handleMouseDown = (e: React.MouseEvent) => {
+        if (!isSelecting || !selection) return;
+
+        if (selection && isPointInSelection(e.clientX, e.clientY, selection)) {
+            setIsDragging(true);
+            setStartPoint({ x: e.clientX, y: e.clientY });
+            return;
+        }
+
+        if (selection && isPointNearBorder(e.clientX, e.clientY, selection)) {
+            setIsResizing(true);
+            setStartPoint({ x: e.clientX, y: e.clientY });
+            return;
+        }
+
+        setIsDown(true);
+        setSelection({
+            startX: e.clientX,
+            startY: e.clientY,
+            width: 0,
+            height: 0,
+        });
+        setStartPoint({ x: e.clientX, y: e.clientY });
+    };
+
+    const handleMouseMove = (e: React.MouseEvent) => {
+        if (!isSelecting || !startPoint) return;
+
+        if (isDragging && selection) {
+            const deltaX = e.clientX - startPoint.x;
+            const deltaY = e.clientY - startPoint.y;
+
+            setSelection({
+                startX: selection.startX + deltaX,
+                startY: selection.startY + deltaY,
+                width: selection.width,
+                height: selection.height,
+            });
+
+            setStartPoint({ x: e.clientX, y: e.clientY });
+            return;
+        }
+
+        if (isResizing && selection && resizeDirection) {
+            handleResize(e, selection, resizeDirection);
+            return;
+        }
+
+        if (startPoint) {
+            const width = e.clientX - startPoint.x;
+            const height = e.clientY - startPoint.y;
+
+            setSelection({
+                startX: width >= 0 ? startPoint.x : e.clientX,
+                startY: height >= 0 ? startPoint.y : e.clientY,
+                width: Math.abs(width),
+                height: Math.abs(height),
+            });
+        }
+    };
+
+    const handleMouseUp = () => {
+        setIsDragging(false);
+        setIsResizing(false);
+        setStartPoint(null);
+        setIsDown(false);
+    };
+
+    const isPointInSelection = (x: number, y: number, sel: SelectionArea): boolean => {
+        return (
+            x >= sel.startX &&
+            x <= sel.startX + sel.width &&
+            y >= sel.startY &&
+            y <= sel.startY + sel.height
+        );
+    };
+
+    const isPointNearBorder = (x: number, y: number, sel: SelectionArea): boolean => {
+        const borderThreshold = 10;
+        const isNearLeftBorder = Math.abs(x - sel.startX) <= borderThreshold;
+        const isNearRightBorder = Math.abs(x - (sel.startX + sel.width)) <= borderThreshold;
+        const isNearTopBorder = Math.abs(y - sel.startY) <= borderThreshold;
+        const isNearBottomBorder = Math.abs(y - (sel.startY + sel.height)) <= borderThreshold;
+
+        if (isNearLeftBorder) {
+            setResizeDirection("left");
+            return true;
+        } else if (isNearRightBorder) {
+            setResizeDirection("right");
+            return true;
+        } else if (isNearTopBorder) {
+            setResizeDirection("top");
+            return true;
+        } else if (isNearBottomBorder) {
+            setResizeDirection("bottom");
+            return true;
+        }
+
+        return false;
+    };
+
+    const handleResize = (e: React.MouseEvent, sel: SelectionArea, direction: string) => {
+        const deltaX = e.clientX - (startPoint?.x || 0);
+        const deltaY = e.clientY - (startPoint?.y || 0);
+
+        const newSelection = { ...sel };
+
+        switch (direction) {
+            case "left":
+                newSelection.startX = sel.startX + deltaX;
+                newSelection.width = sel.width - deltaX;
+                break;
+            case "right":
+                newSelection.width = sel.width + deltaX;
+                break;
+            case "top":
+                newSelection.startY = sel.startY + deltaY;
+                newSelection.height = sel.height - deltaY;
+                break;
+            case "bottom":
+                newSelection.height = sel.height + deltaY;
+                break;
+        }
+
+        setSelection(newSelection);
+        setStartPoint({ x: e.clientX, y: e.clientY });
+    };
+
+    const handleConfirm = async () => {
+        if (selection) {
+            try {
+                const url = await browser.runtime.sendMessage({
+                    type: "captureScreenshot",
+                });
+                const newImg = await cropImage(url, selection);
+                browser.runtime.sendMessage({
+                    type: "latexOcr",
+                    data: {
+                        img: URL.createObjectURL(newImg),
+                    },
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        }
+        resetSelection();
+    };
+
+    const cropImage = async (imageUrl: string, sel: SelectionArea): Promise<File> => {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement("canvas");
+                canvas.width = sel.width;
+                canvas.height = sel.height;
+                const ctx = canvas.getContext("2d");
+                if (!ctx) {
+                    reject(new Error("Failed to get canvas context"));
+                    return;
+                }
+                ctx.drawImage(
+                    img,
+                    sel.startX,
+                    sel.startY,
+                    sel.width,
+                    sel.height,
+                    0,
+                    0,
+                    sel.width,
+                    sel.height,
+                );
+                canvas.toBlob((blob) => {
+                    if (!blob) {
+                        reject(new Error("Failed to create blob from canvas"));
+                        return;
+                    }
+                    const croppedFile = new File([blob], "cropped-screenshot.png", {
+                        type: "image/png",
+                    });
+
+                    resolve(croppedFile);
+                }, "image/png");
+            };
+            img.onerror = () => {
+                reject(new Error("Failed to load image"));
+            };
+            img.src = imageUrl;
+        });
+    };
+
+    const handleCancel = () => {
+        resetSelection();
+    };
+
+    const resetSelection = () => {
+        setIsSelecting(false);
+        setSelection(null);
+        setIsDragging(false);
+        setIsResizing(false);
+        setStartPoint(null);
+    };
+
+    if (!isSelecting) {
+        return null;
+    }
+
+    return (
+        <div
+            ref={overlayRef}
+            className={styles.latexOcrOverlay}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+        >
+            {selection && (
+                <>
+                    <div className={styles.bg}>
+                        <div
+                            style={{
+                                top: 0,
+                                left: 0,
+                                bottom: 0,
+                                width: `${selection.startX}px`,
+                            }}
+                        ></div>
+                        <div
+                            style={{
+                                top: 0,
+                                left: `${selection.startX}px`,
+                                height: `${selection.startY}px`,
+                                right: 0,
+                            }}
+                        ></div>
+                        <div
+                            style={{
+                                top: `${selection.startY}px`,
+                                left: `${selection.startX + selection.width}px`,
+                                bottom: 0,
+                                right: 0,
+                            }}
+                        ></div>
+                        <div
+                            style={{
+                                top: `${selection.startY + selection.height}px`,
+                                left: `${selection.startX}px`,
+                                bottom: 0,
+                                width: `${selection.width}px`,
+                            }}
+                        ></div>
+                    </div>
+                    <div
+                        className={styles.selectionArea}
+                        style={{
+                            left: `${selection.startX}px`,
+                            top: `${selection.startY}px`,
+                            width: `${selection.width}px`,
+                            height: `${selection.height}px`,
+                        }}
+                    >
+                        {!isDown && (
+                            <div className={styles.selectionControls}>
+                                <Button
+                                    danger
+                                    className={styles.cancelButton}
+                                    onClick={handleCancel}
+                                    type="primary"
+                                    icon={<CloseOutlined />}
+                                />
+                                <Button
+                                    className={styles.confirmButton}
+                                    onClick={handleConfirm}
+                                    type="primary"
+                                    icon={<CheckOutlined />}
+                                />
+                            </div>
+                        )}
+                    </div>
+                </>
+            )}
+        </div>
+    );
+};
+
+export default LatexOcr;
