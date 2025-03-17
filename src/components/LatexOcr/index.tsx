@@ -14,17 +14,23 @@ interface SelectionArea {
 
 const LatexOcr: React.FC = () => {
     const [isSelecting, setIsSelecting] = useState<boolean>(false);
-    const [selection, setSelection] = useState<SelectionArea | null>(null);
+    const [selection, setSelection] = useState<SelectionArea>({
+        startX: -10,
+        startY: 0,
+        width: 0,
+        height: 0,
+    });
     const [isDragging, setIsDragging] = useState<boolean>(false);
     const [isResizing, setIsResizing] = useState<boolean>(false);
     const [resizeDirection, setResizeDirection] = useState<string>("");
     const [startPoint, setStartPoint] = useState<{ x: number; y: number } | null>(null);
     const [isDown, setIsDown] = useState<boolean>(false);
+    const [bgImg, setBgImg] = useState<string>("");
     const overlayRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         Mousetrap.bind(["ctrl+k", "command+k"], () => {
-            setIsSelecting(true);
+            captureScreenshot();
         });
 
         Mousetrap.bind("esc", () => {
@@ -36,6 +42,18 @@ const LatexOcr: React.FC = () => {
             Mousetrap.unbind("esc");
         };
     }, []);
+
+    const captureScreenshot = async () => {
+        try {
+            const url = await browser.runtime.sendMessage({
+                type: "captureScreenshot",
+            });
+            setBgImg(url);
+            setIsSelecting(true);
+        } catch (e) {
+            console.error(e);
+        }
+    };
 
     const handleMouseDown = (e: React.MouseEvent) => {
         if (!isSelecting || !selection) return;
@@ -168,10 +186,7 @@ const LatexOcr: React.FC = () => {
     const handleConfirm = async () => {
         if (selection) {
             try {
-                const url = await browser.runtime.sendMessage({
-                    type: "captureScreenshot",
-                });
-                const newImg = await cropImage(url, selection);
+                const newImg = await cropImage(bgImg, selection);
                 browser.runtime.sendMessage({
                     type: "latexOcr",
                     data: {
@@ -233,10 +248,16 @@ const LatexOcr: React.FC = () => {
 
     const resetSelection = () => {
         setIsSelecting(false);
-        setSelection(null);
+        setSelection({
+            startX: -10,
+            startY: 0,
+            width: 0,
+            height: 0,
+        });
         setIsDragging(false);
         setIsResizing(false);
         setStartPoint(null);
+        setBgImg("");
     };
 
     if (!isSelecting) {
@@ -245,77 +266,76 @@ const LatexOcr: React.FC = () => {
 
     return (
         <div
+            style={{
+                backgroundImage: `url(${bgImg})`,
+            }}
             ref={overlayRef}
             className={styles.latexOcrOverlay}
             onMouseDown={handleMouseDown}
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
         >
-            {selection && (
-                <>
-                    <div className={styles.bg}>
-                        <div
-                            style={{
-                                top: 0,
-                                left: 0,
-                                bottom: 0,
-                                width: `${selection.startX}px`,
-                            }}
-                        ></div>
-                        <div
-                            style={{
-                                top: 0,
-                                left: `${selection.startX}px`,
-                                height: `${selection.startY}px`,
-                                right: 0,
-                            }}
-                        ></div>
-                        <div
-                            style={{
-                                top: `${selection.startY}px`,
-                                left: `${selection.startX + selection.width}px`,
-                                bottom: 0,
-                                right: 0,
-                            }}
-                        ></div>
-                        <div
-                            style={{
-                                top: `${selection.startY + selection.height}px`,
-                                left: `${selection.startX}px`,
-                                bottom: 0,
-                                width: `${selection.width}px`,
-                            }}
-                        ></div>
+            <div className={styles.bg}>
+                <div
+                    style={{
+                        top: 0,
+                        left: 0,
+                        bottom: 0,
+                        width: `${selection.startX}px`,
+                    }}
+                ></div>
+                <div
+                    style={{
+                        top: 0,
+                        left: `${selection.startX}px`,
+                        height: `${selection.startY}px`,
+                        right: 0,
+                    }}
+                ></div>
+                <div
+                    style={{
+                        top: `${selection.startY}px`,
+                        left: `${selection.startX + selection.width}px`,
+                        bottom: 0,
+                        right: 0,
+                    }}
+                ></div>
+                <div
+                    style={{
+                        top: `${selection.startY + selection.height}px`,
+                        left: `${selection.startX}px`,
+                        bottom: 0,
+                        width: `${selection.width}px`,
+                    }}
+                ></div>
+            </div>
+            <div
+                className={styles.selectionArea}
+                style={{
+                    left: `${selection.startX}px`,
+                    top: `${selection.startY}px`,
+                    width: `${selection.width}px`,
+                    height: `${selection.height}px`,
+                }}
+            >
+                {!isDown && (
+                    <div className={styles.selectionControls}>
+                        <Button
+                            danger
+                            className={styles.cancelButton}
+                            onClick={handleCancel}
+                            type="primary"
+                            icon={<CloseOutlined />}
+                        />
+                        <Button
+                            className={styles.confirmButton}
+                            onClick={handleConfirm}
+                            type="primary"
+                            icon={<CheckOutlined />}
+                        />
                     </div>
-                    <div
-                        className={styles.selectionArea}
-                        style={{
-                            left: `${selection.startX}px`,
-                            top: `${selection.startY}px`,
-                            width: `${selection.width}px`,
-                            height: `${selection.height}px`,
-                        }}
-                    >
-                        {!isDown && (
-                            <div className={styles.selectionControls}>
-                                <Button
-                                    danger
-                                    className={styles.cancelButton}
-                                    onClick={handleCancel}
-                                    type="primary"
-                                    icon={<CloseOutlined />}
-                                />
-                                <Button
-                                    className={styles.confirmButton}
-                                    onClick={handleConfirm}
-                                    type="primary"
-                                    icon={<CheckOutlined />}
-                                />
-                            </div>
-                        )}
-                    </div>
-                </>
-            )}
+                )}
+            </div>
         </div>
     );
 };

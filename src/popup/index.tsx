@@ -1,9 +1,10 @@
-// import * as React from "react";
-// import * as ReactDOM from "react-dom";
+import * as React from "react";
+import * as ReactDOM from "react-dom";
 import browser from "webextension-polyfill";
+import { Popup } from "../components/Popup";
 import "@src/utils/i18";
 import "reset.css";
 
 browser.tabs.query({ active: true, currentWindow: true }).then(() => {
-    // ReactDOM.render(<Popup />, document.getElementById("popup"));
+    ReactDOM.render(<Popup />, document.getElementById("popup"));
 });
