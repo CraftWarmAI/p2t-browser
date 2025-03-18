@@ -6,12 +6,13 @@ browser.runtime.onMessage.addListener(async (params: SendMessage) => {
     } else if (params.type === "captureScreenshot") {
         return captureScreenshot();
     } else if (params.type === "latexOcr") {
-        console.log(params.data.img);
         await browser.downloads.download({
             url: params.data.img,
             filename: `cropped_screenshot_${Date.now()}.png`,
             saveAs: true,
         });
+    } else if (params.type === "openPopup") {
+        browser.action.openPopup();
     }
 
     return false;

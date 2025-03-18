@@ -28,5 +28,5 @@
         "128": "icon-128.png"
     },
     "host_permissions": ["<all_urls>"],
-    "permissions": ["tabs", "activeTab", "downloads"]
+    "permissions": ["tabs", "activeTab", "downloads", "storage"]
 }

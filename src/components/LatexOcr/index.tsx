@@ -4,6 +4,7 @@ import { CloseOutlined, CheckOutlined } from "@ant-design/icons";
 import browser from "webextension-polyfill";
 import styles from "./component.less";
 import Mousetrap from "mousetrap";
+import { useDispatch, useSelector } from "react-redux";
 
 interface SelectionArea {
     startX: number;
@@ -13,6 +14,8 @@ interface SelectionArea {
 }
 
 const LatexOcr: React.FC = () => {
+    const dispatch = useDispatch();
+    const name = useSelector((state: any) => state.userInfo.name);
     const [isSelecting, setIsSelecting] = useState<boolean>(false);
     const [selection, setSelection] = useState<SelectionArea>({
         startX: -10,
@@ -243,6 +246,10 @@ const LatexOcr: React.FC = () => {
     };
 
     const handleCancel = () => {
+        dispatch({
+            type: "userInfo/SET_NAME",
+            payload: "d_" + Date.now(),
+        });
         resetSelection();
     };
 
@@ -275,6 +282,7 @@ const LatexOcr: React.FC = () => {
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
         >
+            {name}
             <div className={styles.bg}>
                 <div
                     style={{

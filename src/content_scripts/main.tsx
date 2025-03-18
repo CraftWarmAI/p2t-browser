@@ -1,5 +1,5 @@
 import React from "react";
-import store from "./redux/index";
+import store from "../redux/index";
 import { Provider } from "react-redux";
 import { render, delReactDom } from "@src/utils/dom";
 import LatexOcr from "@src/components/LatexOcr";

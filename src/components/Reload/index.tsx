@@ -1,7 +1,18 @@
-import React from "react";
+import React, { useEffect } from "react";
 import browser from "webextension-polyfill";
+import Mousetrap from "mousetrap";
 
 const Reload = () => {
+    useEffect(() => {
+        Mousetrap.bind(["command+m"], () => {
+            reload();
+        });
+
+        return () => {
+            Mousetrap.unbind(["command+m"]);
+        };
+    }, []);
+
     const reload = () => {
         browser.runtime.sendMessage({
             type: "reload",
@@ -14,7 +25,7 @@ const Reload = () => {
             style={{
                 position: "fixed",
                 left: "50%",
-                top: 0,
+                top: "-100px",
                 marginLeft: "-120px",
                 zIndex: 2147483647,
                 width: "240px",

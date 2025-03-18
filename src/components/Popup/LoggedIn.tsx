@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from "react";
 import { Button, Typography, Space, Divider, Tag } from "antd";
 import { CrownOutlined, LogoutOutlined } from "@ant-design/icons";
-import browser from "webextension-polyfill";
 import styles from "./LoggedIn.less";
+import { useDispatch, useSelector } from "react-redux";
 
 const { Title, Text } = Typography;
 
 export const LoggedIn: React.FC<{
     onLogOut: () => void;
 }> = ({ onLogOut }) => {
+    const dispatch = useDispatch();
+    const name = useSelector((state: any) => state.userInfo.name);
     const [userInfo, setUserInfo] = useState({
-        email: "user@example.com",
+        email: name,
         vipExpiry: "2023-12-31",
         isVip: true,
     });
@@ -28,18 +30,10 @@ export const LoggedIn: React.FC<{
     }, []);
 
     const handleLogout = async () => {
-        // Implement logout logic
-        try {
-            await browser.storage.local.remove("userInfo");
-            await browser.runtime.sendMessage({ type: "userLogout" });
-            setUserInfo({
-                email: "",
-                vipExpiry: "",
-                isVip: false,
-            });
-        } catch (error) {
-            console.error("Failed to logout:", error);
-        }
+        dispatch({
+            type: "userInfo/SET_NAME",
+            payload: "d_" + Date.now(),
+        });
     };
 
     const getRemainingDays = () => {
@@ -71,7 +65,7 @@ export const LoggedIn: React.FC<{
             <Divider />
 
             <div className={styles.subscriptionInfo}>
-                <Title level={5}>Subscription Status</Title>
+                <Title level={5}>Subscription Status{name}</Title>
                 {userInfo.isVip ? (
                     <Space direction="vertical" size="small">
                         <Text>
