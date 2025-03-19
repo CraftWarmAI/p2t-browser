@@ -46,7 +46,7 @@
         "@types/jest": "^26.0.14",
         "@types/node": "^14.11.8",
         "@types/ramda": "^0.28.20",
-        "@types/react": "^17.0.2",
+        "@types/react": "17.0.2",
         "@types/react-dom": "^17.0.2",
         "@types/react-test-renderer": "^17.0.1",
         "@types/webextension-polyfill": "^0.9.0",
@@ -82,7 +82,9 @@
     "dependencies": {
         "@reduxjs/toolkit": "^2.6.1",
         "@types/mousetrap": "^1.6.15",
-        "@types/redux": "^3.6.0",
+        "@types/react-redux": "7.1.24",
+        "@types/react-router-dom": "5.1.8",
+        "@types/react-transition-group": "^4.4.12",
         "antd": "^5.0.7",
         "clipboard": "^2.0.11",
         "copy-webpack-plugin": "^11.0.0",
@@ -95,9 +97,14 @@
         "react-dom": "17.0.2",
         "react-i18next": "^12.1.4",
         "react-redux": "7.2.9",
+        "react-router-dom": "6.30.0",
+        "react-transition-group": "^4.4.5",
         "redux-thunk": "^2.4.2",
         "reset.css": "^2.0.2",
         "webextension-polyfill": "^0.10.0",
         "whatwg-fetch": "^3.6.2"
+    },
+    "resolutions": {
+        "@types/react": "17.0.2"
     }
 }
