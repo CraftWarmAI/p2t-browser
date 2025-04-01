@@ -13,6 +13,10 @@ browser.runtime.onMessage.addListener(async (params: SendMessage) => {
         });
     } else if (params.type === "openPopup") {
         browser.action.openPopup();
+    } else if (params.type === "commandsGetAll") {
+        return browser.commands.getAll();
+    } else if (params.type === "commandsUpdate") {
+        return browser.commands.update(params.data);
     }
 
     return false;

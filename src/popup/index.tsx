@@ -1,11 +1,9 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import browser from "webextension-polyfill";
-import { Provider } from "react-redux";
-import { RouterIndex } from "./routers/Index";
 import store from "../redux/index";
 import "@src/utils/i18";
-import "reset.css";
+import App from "./main";
 
 browser.tabs.query({ active: true, currentWindow: true }).then(async () => {
     const node = document.getElementById("popup");
@@ -23,11 +21,6 @@ browser.tabs.query({ active: true, currentWindow: true }).then(async () => {
                 }
             }
         }
-        ReactDOM.render(
-            <Provider store={store}>
-                <RouterIndex />
-            </Provider>,
-            node,
-        );
+        ReactDOM.render(<App />, node);
     }
 });

@@ -17,7 +17,7 @@ if (build) {
 module.exports = {
     entry: {
         backgroundPage: path.join(__dirname, "../src/backgroundPage.ts"),
-        contentScriptMain: path.join(__dirname, "../src/content_scripts/main.tsx"),
+        contentScriptMain: path.join(__dirname, "../src/contentScripts/index.tsx"),
         popup: path.join(__dirname, "../src/popup/index.tsx"),
     },
     output: {

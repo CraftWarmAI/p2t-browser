@@ -9,6 +9,7 @@ let historyValue: any;
 
 store.subscribe(() => {
     if (historyValue !== JSON.stringify(store.getState())) {
+        console.log("写入");
         browser.storage.local.set({ reduxState: JSON.stringify(store.getState()) });
     }
 });
@@ -17,6 +18,7 @@ browser.storage.local.onChanged.addListener((changes: any) => {
     const { newValue } = changes.reduxState;
     historyValue = newValue;
     if (newValue !== JSON.stringify(store.getState())) {
+        console.log("重写");
         const newState = JSON.parse(newValue);
         for (const key in newState) {
             if (newState.hasOwnProperty(key)) {

@@ -4,6 +4,15 @@
     "description": "",
     "version": "",
     "default_locale": "",
+    "commands": {
+        "screenshot": {
+            "suggested_key": {
+                "default": "Ctrl+K",
+                "mac": "Command+K"
+            },
+            "description": "Trigger screenshot recognition"
+        }
+    },
     "action": {
         "default_icon": {
             "16": "icon-16.png",

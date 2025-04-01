@@ -13,7 +13,7 @@ interface SelectionArea {
     height: number;
 }
 
-const LatexOcr: React.FC = () => {
+const Screenshot: React.FC = () => {
     const dispatch = useDispatch();
     const name = useSelector((state: any) => state.userInfo.name);
     const [isSelecting, setIsSelecting] = useState<boolean>(false);
@@ -246,10 +246,10 @@ const LatexOcr: React.FC = () => {
     };
 
     const handleCancel = () => {
-        dispatch({
-            type: "userInfo/SET_NAME",
-            payload: "d_" + Date.now(),
-        });
+        // dispatch({
+        //     type: "userInfo/SET_NAME",
+        //     payload: "d_" + Date.now(),
+        // });
         resetSelection();
     };
 
@@ -348,4 +348,4 @@ const LatexOcr: React.FC = () => {
     );
 };
 
-export default LatexOcr;
+export default Screenshot;

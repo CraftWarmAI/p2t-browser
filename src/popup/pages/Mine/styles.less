@@ -1,50 +1,86 @@
-.popup {
-    min-width: 320px;
-    padding: 16px;
+.container {
+    width: 360px;
+    padding: 24px 16px;
     box-sizing: border-box;
     background-color: #fff;
-}
 
-.userHeader {
-    display: flex;
-    align-items: center;
-    margin-bottom: 16px;
-}
+    .header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 16px;
 
-.avatar {
-    background-color: #1890ff;
-    margin-right: 16px;
-}
+        .logo {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 8px;
+        }
 
-.userInfo {
-    flex: 1;
-}
+        .title {
+            margin: 0;
+            color: #1890ff;
+        }
 
-.userInfo h4 {
-    margin-bottom: 4px;
-}
+        .subtitle {
+            font-size: 14px;
+            margin-top: 4px;
+        }
+    }
 
-.subscriptionInfo {
-    margin-bottom: 16px;
-}
+    .userCard {
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+        box-sizing: border-box;
 
-.subscriptionInfo h5 {
-    margin-bottom: 8px;
-}
+        .userInfo {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
 
-.actions {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 16px;
-    gap: 10px;
-}
+            .infoItem {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+    }
 
-.renewButton {
-    background-color: #1890ff;
-}
+    .divider {
+        margin: 12px 0;
+    }
 
-.logoutButton {
-    flex: 1;
-    background-color: #ff4d4f;
-    color: #fff !important;
+    .buttonGroup {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 16px;
+
+        button {
+            min-width: 100px;
+        }
+    }
+
+    .shortcutSection {
+        margin-top: 16px;
+
+        .shortcutInput {
+            margin-top: 8px;
+            width: 100%;
+
+            &:focus {
+                border-color: #1890ff;
+                box-shadow: 0 0 0 2px rgba(24, 144, 255, 0.2);
+            }
+        }
+    }
+
+    .actions {
+        display: flex;
+        align-items: center;
+        .recharge {
+            flex: 1;
+        }
+        .logout {
+            margin-left: 14px;
+        }
+    }
 }

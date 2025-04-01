@@ -1,96 +1,123 @@
 import React, { useState, useEffect } from "react";
-import { Button, Typography, Space, Divider, Tag } from "antd";
-import { CrownOutlined, LogoutOutlined } from "@ant-design/icons";
+import { useSelector, useDispatch } from "react-redux";
+import browser from "webextension-polyfill";
+import { Card, Typography, Button, Space, Divider } from "antd";
+import { LikeOutlined, LogoutOutlined, EditOutlined } from "@ant-design/icons";
 import styles from "./styles.less";
-import { useDispatch, useSelector } from "react-redux";
+import logoImg from "@src/assets/images/logo.jpg";
 
 const { Title, Text } = Typography;
 
 export const Mine = () => {
     const dispatch = useDispatch();
-    const name = useSelector((state: any) => state.userInfo.name);
-    const [userInfo, setUserInfo] = useState({
-        email: name,
-        vipExpiry: "2023-12-31",
-        isVip: true,
-    });
+    const userInfo = useSelector((state: any) => state.userInfo);
+    const [shortcut, setShortcut] = useState("");
 
     useEffect(() => {
-        // Fetch user info from storage or API
-        const fetchUserInfo = async () => {
-            try {
-            } catch (error) {
-                console.error("Failed to fetch user info:", error);
-            }
-        };
-
-        fetchUserInfo();
+        init();
     }, []);
 
-    const handleLogout = async () => {
-        dispatch({
-            type: "userInfo/SET_NAME",
-            payload: "d_" + Date.now(),
+    const init = async () => {
+        try {
+            const getCommands = await browser.runtime.sendMessage({
+                type: "commandsGetAll",
+            });
+            const screenshot = getCommands.find((item: any) => item.name === "screenshot");
+            setShortcut(screenshot.shortcut);
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    const handleRecharge = () => {
+        browser.tabs.create({
+            url: "https://p2t.breezedeus.com/pricing",
         });
     };
 
-    const getRemainingDays = () => {
-        if (!userInfo.vipExpiry) return 0;
+    const handleLogout = () => {
+        dispatch({
+            type: "userInfo/LOGOUT",
+        });
+        browser.tabs.create({
+            url: "https://p2t.breezedeus.com?event=logout",
+        });
+    };
 
-        const today = new Date();
-        const expiryDate = new Date(userInfo.vipExpiry);
-        const diffTime = expiryDate.getTime() - today.getTime();
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const formatDate = (timestamp: number) => {
+        if (!timestamp) return "N/A";
+        return new Date(timestamp * 1000).toLocaleDateString();
+    };
 
-        return diffDays > 0 ? diffDays : 0;
+    const recordShortcut = () => {
+        browser.tabs.create({
+            url: "chrome://extensions/shortcuts",
+        });
     };
 
     return (
-        <div className={styles.popup}>
-            <div className={styles.userHeader}>
+        <div className={styles.container}>
+            <div className={styles.header}>
+                <img src={logoImg} alt="Pix2Text Logo" className={styles.logo} />
+                <Title level={3} className={styles.title}>
+                    Pix2Text
+                </Title>
+                <Text type="secondary" className={styles.subtitle}>
+                    A Free Alternative to Mathpix
+                </Text>
+            </div>
+
+            <Card className={styles.userCard}>
                 <div className={styles.userInfo}>
-                    <Title level={4}>{userInfo.email}</Title>
-                    {userInfo.isVip ? (
-                        <Tag color="gold" icon={<CrownOutlined />}>
-                            VIP Member
-                        </Tag>
-                    ) : (
-                        <Tag>Free User</Tag>
-                    )}
-                </div>
-            </div>
+                    <div className={styles.infoItem}>
+                        <Text strong>Email:</Text>
+                        <Text>{userInfo.email || "Not available"}</Text>
+                    </div>
 
-            <Divider />
-
-            <div className={styles.subscriptionInfo}>
-                <Title level={5}>Subscription Status{name}</Title>
-                {userInfo.isVip ? (
-                    <Space direction="vertical" size="small">
+                    <div className={styles.infoItem}>
+                        <Text strong>Pro Credits:</Text>
                         <Text>
-                            VIP expires on: <Text strong>{userInfo.vipExpiry}</Text>
+                            {userInfo.proTokens || 0} (Expires: {formatDate(userInfo.proExpiry)})
                         </Text>
-                        <Text type={getRemainingDays() < 7 ? "danger" : "secondary"}>
-                            {getRemainingDays()} days remaining
-                        </Text>
-                    </Space>
-                ) : (
-                    <Text>You don&apos;t have an active subscription</Text>
-                )}
-            </div>
+                    </div>
 
-            <div className={styles.actions}>
-                <Button type="primary" onClick={() => false} className={styles.renewButton}>
-                    {userInfo.isVip ? "Renew Subscription" : "Upgrade to VIP"}
-                </Button>
-                <Button
-                    danger
-                    icon={<LogoutOutlined />}
-                    onClick={handleLogout}
-                    className={styles.logoutButton}
-                >
-                    Logout
-                </Button>
-            </div>
+                    <div className={styles.infoItem}>
+                        <Text strong>Plus Credits:</Text>
+                        <Text>
+                            {userInfo.plusTokens || 0} (Expires: {formatDate(userInfo.plusExpiry)})
+                        </Text>
+                    </div>
+
+                    <div className={styles.infoItem}>
+                        <Text strong>Screenshot Shortcut:</Text>
+                        <Space>
+                            <Text>{shortcut || "Not set"}</Text>
+                            <Button size="small" icon={<EditOutlined />} onClick={recordShortcut} />
+                        </Space>
+                    </div>
+                </div>
+
+                <Divider className={styles.divider} />
+
+                <div className={styles.actions}>
+                    <Button
+                        className={styles.recharge}
+                        type="primary"
+                        onClick={handleRecharge}
+                        icon={<LikeOutlined />}
+                    >
+                        Recharge Plus
+                    </Button>
+                    <Button
+                        className={styles.logout}
+                        danger
+                        onClick={handleLogout}
+                        icon={<LogoutOutlined />}
+                    >
+                        Logout
+                    </Button>
+                </div>
+            </Card>
         </div>
     );
 };
