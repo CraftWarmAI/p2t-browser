@@ -1,9 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Button } from "antd";
+import { Button, message } from "antd";
 import { CloseOutlined, CheckOutlined } from "@ant-design/icons";
 import browser from "webextension-polyfill";
 import styles from "./component.less";
-import Mousetrap from "mousetrap";
 import { useDispatch, useSelector } from "react-redux";
 
 interface SelectionArea {
@@ -15,7 +14,7 @@ interface SelectionArea {
 
 const Screenshot: React.FC = () => {
     const dispatch = useDispatch();
-    const name = useSelector((state: any) => state.userInfo.name);
+    const logined = useSelector((state: any) => state.userInfo.logined);
     const [isSelecting, setIsSelecting] = useState<boolean>(false);
     const [selection, setSelection] = useState<SelectionArea>({
         startX: -10,
@@ -32,21 +31,25 @@ const Screenshot: React.FC = () => {
     const overlayRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
-        Mousetrap.bind(["ctrl+k", "command+k"], () => {
-            captureScreenshot();
-        });
+        function onMessage(params: SendMessage) {
+            if (params.type === "onCommand") {
+                captureScreenshot();
+            }
+        }
 
-        Mousetrap.bind("esc", () => {
-            resetSelection();
-        });
-
+        browser.runtime.onMessage.addListener(onMessage);
         return () => {
-            Mousetrap.unbind(["ctrl+k", "command+k"]);
-            Mousetrap.unbind("esc");
+            browser.runtime.onMessage.removeListener(onMessage);
         };
     }, []);
 
     const captureScreenshot = async () => {
+        if (!logined) {
+            browser.runtime.sendMessage({
+                type: "openPopup",
+            });
+            return message.warning("Please log in before using the P2T feature.");
+        }
         try {
             const url = await browser.runtime.sendMessage({
                 type: "captureScreenshot",
@@ -190,11 +193,10 @@ const Screenshot: React.FC = () => {
         if (selection) {
             try {
                 const newImg = await cropImage(bgImg, selection);
-                browser.runtime.sendMessage({
-                    type: "latexOcr",
-                    data: {
-                        img: URL.createObjectURL(newImg),
-                    },
+                // URL.createObjectURL(newImg)
+                dispatch({
+                    type: "ocr/SET_SCREENSHOT",
+                    payload: newImg,
                 });
             } catch (e) {
                 console.error(e);
@@ -282,7 +284,6 @@ const Screenshot: React.FC = () => {
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
         >
-            {name}
             <div className={styles.bg}>
                 <div
                     style={{

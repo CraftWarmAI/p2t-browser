@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
-import Screenshot from "./components/LatexOcr";
+import Screenshot from "./components/Screenshot";
+import { OcrModal } from "./components/OcrModal";
 import { Provider, useDispatch } from "react-redux";
 import store from "../redux/index";
 import "@src/utils/i18";
@@ -14,7 +15,12 @@ const Middleware = () => {
         });
     }, []);
 
-    return <Screenshot />;
+    return (
+        <>
+            <Screenshot />
+            <OcrModal />
+        </>
+    );
 };
 
 const App = () => {

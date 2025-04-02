@@ -4,7 +4,7 @@ import browser from "webextension-polyfill";
 import { Card, Typography, Button, Space, Divider } from "antd";
 import { LikeOutlined, LogoutOutlined, EditOutlined } from "@ant-design/icons";
 import styles from "./styles.less";
-import logoImg from "@src/assets/images/logo.jpg";
+import logoImg from "@src/assets/images/logo3.jpg";
 
 const { Title, Text } = Typography;
 
@@ -59,12 +59,14 @@ export const Mine = () => {
         <div className={styles.container}>
             <div className={styles.header}>
                 <img src={logoImg} alt="Pix2Text Logo" className={styles.logo} />
-                <Title level={3} className={styles.title}>
-                    Pix2Text
-                </Title>
-                <Text type="secondary" className={styles.subtitle}>
-                    A Free Alternative to Mathpix
-                </Text>
+                <div className={styles.logoText}>
+                    <Title level={3} className={styles.title}>
+                        Pix2Text
+                    </Title>
+                    <Text type="secondary" className={styles.subtitle}>
+                        A Free Alternative to Mathpix
+                    </Text>
+                </div>
             </div>
 
             <Card className={styles.userCard}>

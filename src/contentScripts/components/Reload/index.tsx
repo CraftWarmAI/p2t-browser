@@ -17,7 +17,10 @@ const Reload = () => {
         browser.runtime.sendMessage({
             type: "reload",
         });
-        location.reload();
+        const timer = setTimeout(() => {
+            location.reload();
+            clearTimeout(timer);
+        }, 1000);
     };
 
     return (

@@ -22,6 +22,17 @@ browser.runtime.onMessage.addListener(async (params: SendMessage) => {
     return false;
 });
 
+browser.commands.onCommand.addListener((command) => {
+    browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
+        if (tabs.length > 0) {
+            browser.tabs.sendMessage(tabs[0].id as number, {
+                type: "onCommand",
+                data: command,
+            });
+        }
+    });
+});
+
 async function captureScreenshot(): Promise<string> {
     try {
         const url = await browser.tabs.captureVisibleTab(undefined, { format: "png" });

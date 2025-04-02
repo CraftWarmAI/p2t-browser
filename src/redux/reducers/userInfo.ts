@@ -2,7 +2,13 @@ import { createSlice } from "@reduxjs/toolkit";
 
 const userInfoSlice = createSlice({
     name: "userInfo",
-    initialState: { name: "测试", user_id: "1", logined: true },
+    initialState: {
+        name: "测试",
+        quota: {
+            plus_quota: 0,
+        },
+        logined: true,
+    },
     reducers: {
         SET_LOGINED: (state, action) => {
             state.logined = action.payload;

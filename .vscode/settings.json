@@ -3,7 +3,10 @@
   "css.lint.unknownAtRules": "ignore",
   "cSpell.words": [
     "breezedeus",
+    "chtml",
     "logined",
+    "mackdown",
+    "mathjax",
     "Mathpix",
     "persistor",
     "webextension"
