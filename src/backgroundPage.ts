@@ -1,4 +1,5 @@
 import browser from "webextension-polyfill";
+import services from "@src/services/ocr";
 
 browser.runtime.onMessage.addListener(async (params: SendMessage) => {
     if (params.type === "reload") {
@@ -17,6 +18,15 @@ browser.runtime.onMessage.addListener(async (params: SendMessage) => {
         return browser.commands.getAll();
     } else if (params.type === "commandsUpdate") {
         return browser.commands.update(params.data);
+    } else if (params.type === "fetch") {
+        const { name, value = {} } = params.data;
+        const func: any = services[name as keyof typeof services];
+        try {
+            return await func(value);
+        } catch (err) {
+            console.error(err);
+            return false;
+        }
     }
 
     return false;
@@ -25,10 +35,14 @@ browser.runtime.onMessage.addListener(async (params: SendMessage) => {
 browser.commands.onCommand.addListener((command) => {
     browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
         if (tabs.length > 0) {
-            browser.tabs.sendMessage(tabs[0].id as number, {
-                type: "onCommand",
-                data: command,
-            });
+            try {
+                browser.tabs.sendMessage(tabs[0].id as number, {
+                    type: "onCommand",
+                    data: command,
+                });
+            } catch (error) {
+                console.error("onCommand" + error);
+            }
         }
     });
 });

@@ -20,7 +20,7 @@ const Reload = () => {
         const timer = setTimeout(() => {
             location.reload();
             clearTimeout(timer);
-        }, 1000);
+        }, 2000);
     };
 
     return (

@@ -2,13 +2,23 @@ import React from "react";
 import { render, delReactDom } from "@src/utils/dom";
 import Reload from "./components/Reload";
 import { hrefChange } from "@src/utils/hrefChange";
+import { storeSync } from "@src/utils/storeSync";
+import store from "@src/redux/index";
+import { getQuota } from "@src/redux/actions/ocr";
 import App from "./main";
 
 const { is_build } = process.env;
 
 init();
 
-function init() {
+async function init() {
+    await storeSync(store);
+    if (!store.getState().userInfo.initialize) {
+        await getQuota();
+        store.dispatch({
+            type: "userInfo/SET_INITIALIZE",
+        });
+    }
     pageInit();
 }
 
