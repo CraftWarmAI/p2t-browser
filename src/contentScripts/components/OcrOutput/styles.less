@@ -1,8 +1,126 @@
-.preview {
-    object-fit: contain;
-    width: 100%;
-    max-height: 200px;
-    height: 20vh;
-    background-color: rgba(#000, 0.1);
-    display: block;
+.editorContainer {
+    margin-top: 30px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+
+    .editorPanel,
+    .previewPanel {
+        background-color: var(--card-bg);
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        padding: 20px;
+        height: 540px;
+    }
+
+    .panelHeader {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding-bottom: 10px;
+        margin-bottom: 15px;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .panelTitle {
+        font-weight: 600;
+        color: var(--accent-color);
+    }
+
+    .panelActions {
+        display: flex;
+        gap: 10px;
+    }
+
+    .actionButton {
+        display: flex;
+        align-items: center;
+        background-color: transparent;
+        border: none;
+        color: var(--accent-color);
+        cursor: pointer;
+        padding: 5px;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+    }
+
+    .actionButton:hover {
+        background-color: var(--light-bg);
+    }
+
+    .docxButton {
+        display: flex;
+        align-items: center;
+        height: 28px !important;
+        font-size: 12px;
+        font-weight: 500;
+    }
+
+    .editorTextarea {
+        width: 100%;
+        height: calc(100% - 50px) !important;
+        resize: none !important;
+        border: none;
+        outline: none;
+        font-size: 15px;
+        padding: 10px;
+        box-sizing: border-box;
+        background-color: var(--light-bg);
+        border-radius: 5px;
+    }
+    :global {
+        textArea {
+            resize: none;
+            font-size: 15px;
+            overflow-y: auto;
+            padding: 26px 20px;
+            box-sizing: border-box;
+            background-color: transparent;
+            border: none;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        .ant-input-focused,
+        :where(.css-dev-only-do-not-override-ixblex).ant-input:hover,
+        :where(.css-dev-only-do-not-override-ixblex).ant-input:focus,
+        :where(.css-dev-only-do-not-override-ixblex).ant-input-focused {
+            box-shadow: none;
+            border-color: #ccc !important;
+        }
+    }
+
+    .previewContent {
+        height: calc(100% - 50px);
+        overflow-y: auto;
+        padding: 10px;
+        box-sizing: border-box;
+
+        font-size: 15px;
+        overflow-y: auto;
+        word-wrap: break-word;
+        word-break: normal;
+    }
+
+    /* Ad Container */
+    .adContainer {
+        background-color: var(--card-bg);
+        border-radius: 10px;
+        padding: 5px;
+        margin-bottom: 30px;
+        text-align: center;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        overflow: hidden;
+    }
+
+    .adLabel {
+        text-align: center;
+        font-size: 12px;
+        color: #999;
+        margin-bottom: 5px;
+    }
+
+    .downloadTip {
+        cursor: pointer;
+    }
 }

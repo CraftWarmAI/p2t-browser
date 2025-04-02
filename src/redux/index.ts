@@ -1,18 +1,19 @@
+import _ from "lodash";
 import browser from "webextension-polyfill";
 import { legacy_createStore as createStore, applyMiddleware } from "redux";
 import thunkMiddleware from "redux-thunk";
 import rootReducers from "./reducers";
 
 const store = createStore(rootReducers, applyMiddleware(thunkMiddleware));
-
 let historyValue: any;
 
-store.subscribe(() => {
-    if (historyValue !== JSON.stringify(store.getState())) {
-        console.log("写入");
-        browser.storage.local.set({ reduxState: JSON.stringify(store.getState()) });
-    }
-});
+store.subscribe(
+    _.debounce(() => {
+        if (historyValue !== JSON.stringify(store.getState())) {
+            browser.storage.local.set({ reduxState: JSON.stringify(store.getState()) });
+        }
+    }, 20),
+);
 
 browser.storage.local.onChanged.addListener((changes: any) => {
     const { newValue } = changes.reduxState;

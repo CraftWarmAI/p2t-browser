@@ -4,6 +4,7 @@ import { OcrModal } from "./components/OcrModal";
 import { Provider, useDispatch } from "react-redux";
 import store from "../redux/index";
 import "@src/utils/i18";
+import "./styles.less";
 
 const Middleware = () => {
     const dispatch = useDispatch();

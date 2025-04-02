@@ -122,13 +122,13 @@ export const OcrOutput = () => {
     };
 
     return (
-        <section className={styles["editor-container"]}>
-            <div className={styles["editor-panel"]}>
-                <div className={styles["panel-header"]}>
-                    <div className={styles["panel-title"]}>Markdown Editor</div>
-                    <div className={styles["panel-actions"]}>
+        <section className={styles.editorContainer}>
+            <div className={styles.editorPanel}>
+                <div className={styles.panelHeader}>
+                    <div className={styles.panelTitle}>Markdown Editor</div>
+                    <div className={styles.panelActions}>
                         <div
-                            className={styles["action-button"]}
+                            className={styles.actionButton}
                             id="copyAsin"
                             data-clipboard-text={resultInputValue}
                             title="Copy Content"
@@ -152,22 +152,22 @@ export const OcrOutput = () => {
                 </div>
 
                 <TextArea
-                    className={styles["editor-textarea"]}
+                    className={styles.editorTextarea}
                     value={resultInputValue}
                     onChange={inputChange}
-                    placeholder="Please upload an image or enter your content."
+                    placeholder=""
                 />
             </div>
 
-            <div className={styles["preview-panel"]}>
-                <div className={styles["panel-header"]}>
-                    <div className={styles["panel-title"]}>Preview</div>
-                    <div className={styles["panel-actions"]}>
+            <div className={styles.previewPanel}>
+                <div className={styles.panelHeader}>
+                    <div className={styles.panelTitle}>Preview</div>
+                    <div className={styles.panelActions}>
                         <Button
                             type="primary"
                             loading={downloadLoading}
                             size="small"
-                            className={styles["docx-button"]}
+                            className={styles.docxButton}
                             title="Download as DOCX"
                             disabled={!taskId}
                             onClick={() => exportClick("docx")}
@@ -184,7 +184,7 @@ export const OcrOutput = () => {
                         </Tooltip>
                     </div>
                 </div>
-                <div id="box" className={`${styles["preview-content"]} ${mdStyles.md}`}></div>
+                <div id="box" className={`${styles.previewContent} ${mdStyles.md}`}></div>
             </div>
         </section>
     );

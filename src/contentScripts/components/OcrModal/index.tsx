@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { Modal } from "antd";
 import { OcrInputParams } from "../OcrInputParams";
+import { OcrOutput } from "../OcrOutput";
 import { useDispatch, useSelector } from "react-redux";
 import styles from "./styles.less";
 
 export const OcrModal = () => {
     const dispatch = useDispatch();
+    const ocrStatus = useSelector((state: any) => state.ocr.ocrStatus);
     const openOcrOutputModal = useSelector((state: any) => state.ocr.openOcrOutputModal);
     const screenshot = useSelector((state: any) => state.ocr.screenshot);
     const [previewImgUrl, setPreviewImgUrl] = useState<string>("");
@@ -16,20 +18,19 @@ export const OcrModal = () => {
 
     const onCancelModal = () => {
         dispatch({
-            type: "ocr/SET_OPEN_OCR_OUTPUT_MODAL",
-            payload: false,
+            type: "ocr/CANCEL_OCR",
         });
     };
 
     return (
         <Modal
-            zIndex={2147483647}
+            title="Pix2Text"
             centered
-            closeIcon={null}
             width={{
                 md: "90%",
                 lg: "960px",
-                xl: "1000px",
+                xl: "1100px",
+                xxl: "1400px",
             }}
             open={openOcrOutputModal}
             onCancel={() => onCancelModal()}
@@ -37,7 +38,9 @@ export const OcrModal = () => {
         >
             <img className={styles.preview} src={previewImgUrl} alt="" />
 
-            <OcrInputParams />
+            {ocrStatus === 0 && screenshot && <OcrInputParams />}
+
+            {ocrStatus !== 0 && <OcrOutput />}
         </Modal>
     );
 };
