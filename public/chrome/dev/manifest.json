@@ -23,7 +23,7 @@
     },
     "content_scripts": [
         {
-            "matches": ["http://*/*", "https://*/*", "file:///*"],
+            "matches": ["<all_urls>"],
             "js": ["js/contentScriptMain.js"],
             "run_at": "document_idle"
         }
@@ -37,5 +37,5 @@
         "128": "icon-128.png"
     },
     "host_permissions": ["<all_urls>"],
-    "permissions": ["tabs", "activeTab", "downloads", "storage"]
+    "permissions": ["tabs", "activeTab", "downloads", "storage", "scripting"]
 }

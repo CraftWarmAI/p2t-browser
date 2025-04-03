@@ -1,16 +1,17 @@
 import React, { useState, useEffect } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import browser from "webextension-polyfill";
-import { Card, Typography, Button, Space, Divider } from "antd";
+import { Card, Typography, Button, Space, Divider, message } from "antd";
 import { LikeOutlined, LogoutOutlined, EditOutlined } from "@ant-design/icons";
+import { logout } from "@src/redux/actions/ocr";
 import styles from "./styles.less";
 import logoImg from "@src/assets/images/logo3.jpg";
 
 const { Title, Text } = Typography;
 
 export const Mine = () => {
-    const dispatch = useDispatch();
-    const userInfo = useSelector((state: any) => state.userInfo);
+    const user = useSelector((state: any) => state.userInfo.user);
+    const quota = useSelector((state: any) => state.userInfo.quota);
     const [shortcut, setShortcut] = useState("");
 
     useEffect(() => {
@@ -36,17 +37,13 @@ export const Mine = () => {
     };
 
     const handleLogout = () => {
-        dispatch({
-            type: "userInfo/LOGOUT",
-        });
-        browser.tabs.create({
-            url: "https://p2t.breezedeus.com?event=logout",
-        });
+        logout();
+        message.success("Logged out!");
     };
 
     const formatDate = (timestamp: number) => {
         if (!timestamp) return "N/A";
-        return new Date(timestamp * 1000).toLocaleDateString();
+        return timestamp;
     };
 
     const recordShortcut = () => {
@@ -73,21 +70,27 @@ export const Mine = () => {
                 <div className={styles.userInfo}>
                     <div className={styles.infoItem}>
                         <Text strong>Email:</Text>
-                        <Text>{userInfo.email || "Not available"}</Text>
+                        <Text>{user.email || "Not available"}</Text>
                     </div>
 
                     <div className={styles.infoItem}>
                         <Text strong>Pro Credits:</Text>
-                        <Text>
-                            {userInfo.proTokens || 0} (Expires: {formatDate(userInfo.proExpiry)})
-                        </Text>
+                        <Text>{quota.pro_quota || 0}</Text>
+                    </div>
+
+                    <div className={styles.infoItem}>
+                        <Text strong>Pro Expires:</Text>
+                        <Text>{formatDate(quota.pro_expiry_date)}</Text>
                     </div>
 
                     <div className={styles.infoItem}>
                         <Text strong>Plus Credits:</Text>
-                        <Text>
-                            {userInfo.plusTokens || 0} (Expires: {formatDate(userInfo.plusExpiry)})
-                        </Text>
+                        <Text>{quota.plus_quota || 0}</Text>
+                    </div>
+
+                    <div className={styles.infoItem}>
+                        <Text strong>Plus Expires:</Text>
+                        <Text>{formatDate(quota.plus_expiry_date)}</Text>
                     </div>
 
                     <div className={styles.infoItem}>

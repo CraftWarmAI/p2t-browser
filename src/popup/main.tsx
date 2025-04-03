@@ -15,8 +15,10 @@ const Middleware = () => {
     useEffect(() => {
         if (logined && location.pathname !== "/mine") {
             navigate("/mine");
+        } else if (!logined && location.pathname !== "/") {
+            navigate("/");
         }
-    }, []);
+    }, [logined]);
 
     return <Transition />;
 };

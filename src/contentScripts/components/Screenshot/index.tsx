@@ -15,6 +15,7 @@ interface SelectionArea {
 const Screenshot: React.FC = () => {
     const dispatch = useDispatch();
     const logined = useSelector((state: any) => state.userInfo.logined);
+    const initialize = useSelector((state: any) => state.userInfo.initialize);
     const [isSelecting, setIsSelecting] = useState<boolean>(false);
     const [selection, setSelection] = useState<SelectionArea>({
         startX: -10,
@@ -284,6 +285,7 @@ const Screenshot: React.FC = () => {
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
         >
+            {String(initialize)}
             <div className={styles.bg}>
                 <div
                     style={{
