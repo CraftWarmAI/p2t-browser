@@ -1,25 +1,33 @@
-import React from "react";
+import React, { useState } from "react";
 import Screenshot from "./components/Screenshot";
 import { OcrModal } from "./components/OcrModal";
-import { Provider } from "react-redux";
-import store from "@src/redux/index";
 import "@src/utils/i18";
 import "./styles.less";
 
-const Middleware = () => {
+const App = () => {
+    const [screenshot, setScreenshot] = useState<File | null>(null);
+    const [ocrStatus, setOcrStatus] = useState(0);
+    const [openOcrOutputModal, setOpenOcrOutputModal] = useState(false);
+
+    const onCancelModal = () => {
+        setOpenOcrOutputModal(false);
+        setOcrStatus(0);
+    };
+
+    const onScreenshot = (img: File) => {
+        setScreenshot(img);
+    };
+
     return (
         <>
-            <Screenshot />
-            <OcrModal />
+            <Screenshot onScreenshot={onScreenshot} />
+            <OcrModal
+                onCancelModal={onCancelModal}
+                openOcrOutputModal={openOcrOutputModal}
+                screenshot={screenshot}
+                ocrStatus={ocrStatus}
+            />
         </>
-    );
-};
-
-const App = () => {
-    return (
-        <Provider store={store}>
-            <Middleware />
-        </Provider>
     );
 };
 

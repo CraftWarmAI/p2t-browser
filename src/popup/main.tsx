@@ -1,8 +1,7 @@
 import React, { useEffect } from "react";
 import { HashRouter as Router, useLocation, useNavigate } from "react-router-dom";
 import { Transition } from "./routers/Index";
-import { Provider, useSelector } from "react-redux";
-import store from "../redux/index";
+import { useSelector } from "react-redux";
 import "reset.css";
 
 const Middleware = () => {
@@ -25,11 +24,9 @@ const Middleware = () => {
 
 const App = () => {
     return (
-        <Provider store={store}>
-            <Router>
-                <Middleware />
-            </Router>
-        </Provider>
+        <Router>
+            <Middleware />
+        </Router>
     );
 };
 

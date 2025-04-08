@@ -13,7 +13,6 @@ const userInfoSlice = createSlice({
     name: "userInfo",
     initialState: {
         token: "",
-        initialize: false,
         logined: false,
         user: { ...initUser },
         quota: { ...initQuota },
@@ -37,11 +36,11 @@ const userInfoSlice = createSlice({
             state.quota = { ...initQuota };
             state.user = { ...initUser };
         },
+        a: (state, action) => {
+            state.logined = action.payload;
+        },
         SET_TOKEN: (state, action) => {
             state.token = action.payload;
-        },
-        SET_INITIALIZE: (state) => {
-            state.initialize = true;
         },
         RELOAD: (state, action) => {
             return action.payload;

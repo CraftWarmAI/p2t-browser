@@ -4,12 +4,13 @@ import styles from "./styles.less";
 import logoImg from "@src/assets/images/logo3.jpg";
 import { Button, Typography, Space, Divider } from "antd";
 
+const { node_env } = process.env;
 const { Title, Text } = Typography;
 
 export const Index = () => {
     const handleLogin = async () => {
         browser.tabs.create({
-            url: "https://p2t.breezedeus.com?event=login",
+            url: `https://p2t${node_env === "dev" ? "-dev" : ""}.breezedeus.com?event=login`,
         });
     };
 

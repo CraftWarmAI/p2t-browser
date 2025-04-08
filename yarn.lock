@@ -9555,6 +9555,16 @@ locate-path@^6.0.0:
   dependencies:
     p-locate "^5.0.0"
 
+lodash.assignin@^4.2.0:
+  version "4.2.0"
+  resolved "https://registry.yarnpkg.com/lodash.assignin/-/lodash.assignin-4.2.0.tgz#ba8df5fb841eb0a3e8044232b0e263a8dc6a28a2"
+  integrity sha512-yX/rx6d/UTVh7sSVWVSIMjfnz95evAgDFdb1ZozC35I9mSFCkmzptOzevxjgbQUsc78NR44LVHWjsoMQXy9FDg==
+
+lodash.clonedeep@^4.5.0:
+  version "4.5.0"
+  resolved "https://registry.yarnpkg.com/lodash.clonedeep/-/lodash.clonedeep-4.5.0.tgz#e23f3f9c4f8fbdde872529c1071857a086e5ccef"
+  integrity sha512-H5ZhCF25riFd9uB5UCkVKo61m3S/xZk1x4wA6yp/L3RFP6Z/eHH1ymQcGLo7J3GMPfm0V/7m1tryHuGVxpqEBQ==
+
 lodash.debounce@^4.0.8:
   version "4.0.8"
   resolved "https://registry.yarnpkg.com/lodash.debounce/-/lodash.debounce-4.0.8.tgz#82d79bff30a67c4005ffd5e2515300ad9ca4d7af"
@@ -14180,6 +14190,14 @@ web-resource-inliner@^6.0.1:
     mime "^2.4.6"
     node-fetch "^2.6.0"
     valid-data-url "^3.0.0"
+
+webext-redux@^4.0.0:
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/webext-redux/-/webext-redux-4.0.0.tgz#5c4b9b9db3890d53f0f3db7098e45d20062b2029"
+  integrity sha512-pMyU0mWRz5umC5ISGG4H7src+bwgJUw3lYEtPm5gvJZILC2/ZrEE5mtqi3caSifet684kMtPse0uVyK/9bZMuA==
+  dependencies:
+    lodash.assignin "^4.2.0"
+    lodash.clonedeep "^4.5.0"
 
 webextension-polyfill@^0.10.0:
   version "0.10.0"

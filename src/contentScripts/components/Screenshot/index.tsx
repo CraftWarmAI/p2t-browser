@@ -3,7 +3,8 @@ import { Button, message } from "antd";
 import { CloseOutlined, CheckOutlined } from "@ant-design/icons";
 import browser from "webextension-polyfill";
 import styles from "./component.less";
-import { useDispatch, useSelector } from "react-redux";
+import Mousetrap from "mousetrap";
+import { useSelector } from "react-redux";
 
 interface SelectionArea {
     startX: number;
@@ -12,10 +13,8 @@ interface SelectionArea {
     height: number;
 }
 
-const Screenshot: React.FC = () => {
-    const dispatch = useDispatch();
+const Screenshot: React.FC<{ onScreenshot: (arg0: File) => void }> = (props) => {
     const logined = useSelector((state: any) => state.userInfo.logined);
-    const initialize = useSelector((state: any) => state.userInfo.initialize);
     const [isSelecting, setIsSelecting] = useState<boolean>(false);
     const [selection, setSelection] = useState<SelectionArea>({
         startX: -10,
@@ -32,6 +31,16 @@ const Screenshot: React.FC = () => {
     const overlayRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
+        Mousetrap.bind(["esc"], () => {
+            resetSelection();
+        });
+
+        return () => {
+            Mousetrap.unbind(["esc"]);
+        };
+    }, []);
+
+    useEffect(() => {
         function onMessage(params: SendMessage) {
             if (params.type === "onCommand") {
                 captureScreenshot();
@@ -42,14 +51,14 @@ const Screenshot: React.FC = () => {
         return () => {
             browser.runtime.onMessage.removeListener(onMessage);
         };
-    }, []);
+    }, [logined]);
 
     const captureScreenshot = async () => {
         if (!logined) {
-            browser.runtime.sendMessage({
+            message.warning("Please log in before using the P2T feature.");
+            return await browser.runtime.sendMessage({
                 type: "openPopup",
             });
-            return message.warning("Please log in before using the P2T feature.");
         }
         try {
             const url = await browser.runtime.sendMessage({
@@ -193,12 +202,8 @@ const Screenshot: React.FC = () => {
     const handleConfirm = async () => {
         if (selection) {
             try {
-                const newImg = await cropImage(bgImg, selection);
-                // URL.createObjectURL(newImg)
-                dispatch({
-                    type: "ocr/SET_SCREENSHOT",
-                    payload: newImg,
-                });
+                const newImg: File = await cropImage(bgImg, selection);
+                props.onScreenshot(newImg);
             } catch (e) {
                 console.error(e);
             }
@@ -249,10 +254,6 @@ const Screenshot: React.FC = () => {
     };
 
     const handleCancel = () => {
-        // dispatch({
-        //     type: "userInfo/SET_NAME",
-        //     payload: "d_" + Date.now(),
-        // });
         resetSelection();
     };
 
@@ -285,7 +286,6 @@ const Screenshot: React.FC = () => {
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
         >
-            {String(initialize)}
             <div className={styles.bg}>
                 <div
                     style={{

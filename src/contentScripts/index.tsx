@@ -3,11 +3,13 @@ import { render, delReactDom } from "@src/utils/dom";
 import Reload from "./components/Reload";
 import browser from "webextension-polyfill";
 import { hrefChange } from "@src/utils/hrefChange";
-import { storeSync } from "@src/utils/storeSync";
 import { getQuota } from "@src/redux/actions/ocr";
 import { message } from "antd";
-import store from "@src/redux/index";
+import { Provider } from "react-redux";
 import App from "./main";
+import { Store } from "webext-redux";
+
+const store = new Store();
 
 const { is_build, node_env } = process.env;
 let timer: any;
@@ -15,7 +17,7 @@ let currentToken: string;
 init();
 
 async function init() {
-    await storeSync(store);
+    await store.ready();
     pageInit();
 }
 
@@ -28,7 +30,12 @@ async function pageInit() {
         if (!node) throw new Error("body节点不存在");
 
         // 渲染组件
-        const extId = render(node, <App />);
+        const extId = render(
+            node,
+            <Provider store={store}>
+                <App />
+            </Provider>,
+        );
 
         // 快捷刷新
         if (!is_build) {
@@ -53,6 +60,9 @@ function setToken() {
     ) {
         if (timer) clearInterval(timer);
         timer = setInterval(async () => {
+            if (store.getState().userInfo.logined) {
+                return clearInterval(timer);
+            }
             const token = document.getElementById("ext_login")?.innerHTML || "";
             if (currentToken !== token) {
                 currentToken = token;
@@ -60,13 +70,13 @@ function setToken() {
                     type: "userInfo/SET_TOKEN",
                     payload: token,
                 });
-                const result = getQuota();
+                const result = getQuota(store)();
                 if (Boolean(result)) {
                     setTimeout(() => {
-                        message.warning("Please log in before using the P2T feature.");
+                        message.success("login successfully");
                     }, 2000);
+                    await browser.storage.local.set({ token });
                 }
-                await browser.storage.local.set({ token });
             }
         }, 2000);
     }

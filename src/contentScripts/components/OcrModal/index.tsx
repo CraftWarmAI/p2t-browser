@@ -2,25 +2,22 @@ import React, { useEffect, useState } from "react";
 import { Modal } from "antd";
 import { OcrInputParams } from "../OcrInputParams";
 import { OcrOutput } from "../OcrOutput";
-import { useDispatch, useSelector } from "react-redux";
 import styles from "./styles.less";
 
-export const OcrModal = () => {
-    const dispatch = useDispatch();
-    const ocrStatus = useSelector((state: any) => state.ocr.ocrStatus);
-    const openOcrOutputModal = useSelector((state: any) => state.ocr.openOcrOutputModal);
-    const screenshot = useSelector((state: any) => state.ocr.screenshot);
-    const [previewImgUrl, setPreviewImgUrl] = useState<string>("");
+interface Props {
+    ocrStatus: number;
+    screenshot: File | null;
+    openOcrOutputModal: boolean;
+    onCancelModal: () => void;
+}
+
+export const OcrModal: React.FC<Props> = (props) => {
+    const { ocrStatus, screenshot, openOcrOutputModal, onCancelModal } = props;
+    const [imgUrl, setImgUrl] = useState("");
 
     useEffect(() => {
-        setPreviewImgUrl(screenshot ? URL.createObjectURL(screenshot) : "");
+        setImgUrl(screenshot ? URL.createObjectURL(screenshot) : "");
     }, [screenshot]);
-
-    const onCancelModal = () => {
-        dispatch({
-            type: "ocr/CANCEL_OCR",
-        });
-    };
 
     return (
         <Modal
@@ -36,8 +33,7 @@ export const OcrModal = () => {
             onCancel={() => onCancelModal()}
             footer={null}
         >
-            <img className={styles.preview} src={previewImgUrl} alt="" />
-
+            {screenshot && <img className={styles.preview} src={imgUrl} alt="" />}
             {ocrStatus === 0 && screenshot && <OcrInputParams />}
 
             {ocrStatus !== 0 && <OcrOutput />}

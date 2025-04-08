@@ -1,43 +1,22 @@
-import _ from "lodash";
-import browser from "webextension-polyfill";
-import { storeSyncList } from "@src/config/global";
-import { getNeedStoreData } from "@src/utils/storeSync";
-import { legacy_createStore as createStore, applyMiddleware } from "redux";
-import thunkMiddleware from "redux-thunk";
-import rootReducers from "./reducers";
+import { configureStore } from "@reduxjs/toolkit";
+// import { Store, createWrapStore } from "webext-redux";
+import rootReducer from "./reducers";
 
-const store = createStore(rootReducers, applyMiddleware(thunkMiddleware));
-let historyValue: any;
-
-store.subscribe(
-    _.debounce(() => {
-        const newValue = getNeedStoreData(store);
-        if (historyValue !== newValue) {
-            console.log("写入");
-            if (!historyValue) {
-                historyValue = newValue;
-            }
-            browser.storage.local.set({ reduxState: newValue });
-        }
-    }, 20),
-);
-
-browser.storage.local.onChanged.addListener((changes: any) => {
-    const { newValue } = changes.reduxState;
-    historyValue = newValue;
-    const oldValue = getNeedStoreData(store);
-    if (newValue !== oldValue) {
-        console.log("重写");
-        const newState = JSON.parse(newValue);
-        for (const key in newState) {
-            if (storeSyncList.includes(key) && newState.hasOwnProperty(key)) {
-                store.dispatch({
-                    type: `${key}/RELOAD`,
-                    payload: newState[key],
-                });
-            }
-        }
-    }
+export const store: any = configureStore({
+    reducer: rootReducer,
+    middleware: (getDefaultMiddleware) => getDefaultMiddleware(),
 });
 
-export default store;
+// 创建一个 webext-redux 的 Store 实例用于跨浏览器上下文通信
+// const proxyStore = new Store();
+
+// 这里的写法有问题，不能直接赋值这些方法
+// webext-redux 的 Store 有自己的实现方式，不应该覆盖其原有方法
+// 应该使用 wrapStore 方法将 Redux store 连接到 proxyStore
+
+// 正确的用法应该是:
+// import { wrapStore } from 'webext-redux';
+// createWrapStore(store);
+
+export type RootState = ReturnType<typeof rootReducer>;
+export type AppDispatch = typeof store.dispatch;

@@ -10,6 +10,7 @@
     "mathjax",
     "Mathpix",
     "persistor",
+    "webext",
     "webextension"
   ]
 }

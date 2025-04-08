@@ -106,6 +106,7 @@
         "react-transition-group": "^4.4.5",
         "redux-thunk": "^2.4.2",
         "reset.css": "^2.0.2",
+        "webext-redux": "^4.0.0",
         "webextension-polyfill": "^0.10.0",
         "whatwg-fetch": "^3.6.2"
     },
