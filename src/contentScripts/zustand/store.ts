@@ -2,36 +2,43 @@ import { create } from "zustand";
 import { fileTypeItems, languages, models } from "@src/config/ocrParamsConfig";
 
 interface OcrState {
+    orcLoading: boolean;
+    ocrInputValue: string;
     model: string;
     language: string;
     fileType: string;
     openOcrOutputModal: boolean;
     screenshot: File | null;
     ocrStatus: 0 | 1 | 2;
-    resultInputValue: string;
     taskId: string | null;
+    callId: string | null;
 
+    setOrcLoading: (payload: boolean) => void;
+    setOcrInputValue: (payload: string) => void;
     setModel: (payload: string) => void;
     setLanguage: (payload: string) => void;
     setFileType: (payload: string) => void;
     setOpenOcrOutputModal: (payload: boolean) => void;
     setScreenshot: (payload: File | null) => void;
     setOcrStatus: (payload: 0 | 1 | 2) => void;
-    setResultInputValue: (payload: string) => void;
     setTaskId: (payload: string | null) => void;
     onCancelOcr: () => void;
 }
 
 export const useOcrStore = create<OcrState>((set) => ({
+    orcLoading: false,
+    ocrInputValue: "",
     model: models[0].value,
     language: languages[1].value,
     fileType: fileTypeItems[1].value,
     openOcrOutputModal: false,
     screenshot: null,
     ocrStatus: 0,
-    resultInputValue: "",
     taskId: null,
+    callId: null,
 
+    setOrcLoading: (payload) => set((state) => ({ ...state, orcLoading: payload })),
+    setOcrInputValue: (payload) => set((state) => ({ ...state, resultInputValue: payload })),
     setModel: (payload) => set((state) => ({ ...state, model: payload })),
     setLanguage: (payload) => set((state) => ({ ...state, language: payload })),
     setFileType: (payload) => set((state) => ({ ...state, fileType: payload })),
@@ -43,7 +50,6 @@ export const useOcrStore = create<OcrState>((set) => ({
             openOcrOutputModal: true,
         })),
     setOcrStatus: (payload) => set((state) => ({ ...state, ocrStatus: payload })),
-    setResultInputValue: (payload) => set((state) => ({ ...state, resultInputValue: payload })),
     setTaskId: (payload) => set((state) => ({ ...state, taskId: payload })),
     onCancelOcr: () =>
         set((state) => ({

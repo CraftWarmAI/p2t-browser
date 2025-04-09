@@ -1,5 +1,5 @@
 import React from "react";
-import { render, delReactDom } from "@src/utils/dom";
+import { render } from "@src/utils/dom";
 import Reload from "./components/Reload";
 import browser from "webextension-polyfill";
 import { hrefChange } from "@src/utils/hrefChange";
@@ -27,24 +27,31 @@ async function pageInit() {
         const node = document.getElementsByTagName("body")?.[0];
         if (!node) throw new Error("body节点不存在");
 
+        // 清理历史dom
+        const childNodeId = "webext_p2t_2025";
+        let childNode = document.getElementById(childNodeId);
+        if (childNode && childNode.parentElement) {
+            childNode.parentElement.removeChild(childNode);
+        }
+        childNode = document.createElement("div");
+        childNode.setAttribute("id", childNodeId);
+        node?.appendChild(childNode);
+
         // 渲染组件
-        const extId = render(
-            node,
+        render(
+            childNode,
             <Provider store={store}>
                 <App />
             </Provider>,
         );
 
         // 快捷刷新
-        let reloadId: string;
         if (!is_build) {
-            reloadId = render(node, <Reload />);
+            render(childNode, <Reload />);
         }
 
         // 监听href更新，重新加载组件
         hrefChange(async () => {
-            delReactDom(extId);
-            if (reloadId) delReactDom(reloadId);
             if (timer) clearInterval(timer);
             return pageInit();
         });
@@ -63,7 +70,7 @@ function setToken() {
     ) {
         if (timer) clearInterval(timer);
         timer = setInterval(async () => {
-            if (await store.getState().userInfo.logined) {
+            if (store.getState().userInfo.logined) {
                 return clearInterval(timer);
             }
             const token = document.getElementById("ext_login")?.innerHTML || "";

@@ -4,6 +4,7 @@ import { getQuota } from "@src/redux/actions/ocr";
 import { getToken } from "@src/utils/cookie";
 import { store } from "@src/redux/store";
 import { wrapStore } from "webext-redux";
+import { base64ToFile } from "@src/utils/fileConversion";
 
 try {
     wrapStore(store);
@@ -27,15 +28,9 @@ browser.runtime.onInstalled.addListener((details) => {
 try {
     browser.runtime.onMessage.addListener(async (params: SendMessage) => {
         if (params.type === "reload") {
-            browser.runtime.reload();
+            return browser.runtime.reload();
         } else if (params.type === "captureScreenshot") {
             return captureScreenshot();
-        } else if (params.type === "latexOcr") {
-            await browser.downloads.download({
-                url: params.data.img,
-                filename: `cropped_screenshot_${Date.now()}.png`,
-                saveAs: true,
-            });
         } else if (params.type === "openPopup") {
             return await browser.action.openPopup();
         } else if (params.type === "commandsGetAll") {
@@ -43,12 +38,26 @@ try {
         } else if (params.type === "commandsUpdate") {
             return browser.commands.update(params.data);
         } else if (params.type === "fetch") {
-            const { name, value = {} } = params.data;
+            const { name, value = {}, type } = params.data;
             const func: any = services[name as keyof typeof services];
             try {
-                return await func(value);
+                let newValue: any;
+                if (type === "formData") {
+                    newValue = new FormData();
+                    for (const key in value) {
+                        let item = value[key];
+                        if (key === "image") {
+                            item = base64ToFile(value[key], "ext.png", "image/png");
+                            console.log(item);
+                        }
+                        newValue.append(key, item);
+                    }
+                } else {
+                    newValue = value;
+                }
+                return await func(newValue);
             } catch (err) {
-                console.info(err);
+                console.log(err);
                 return false;
             }
         }
@@ -56,8 +65,8 @@ try {
         return false;
     });
 } catch (error) {
-    console.info("======== bg通信模块 =========");
-    console.info(error);
+    console.log("======== bg通信模块 =========");
+    console.log(error);
 }
 
 browser.commands.onCommand.addListener((command) => {

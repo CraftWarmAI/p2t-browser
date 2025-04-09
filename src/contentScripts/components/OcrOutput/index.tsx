@@ -5,6 +5,7 @@ import mathjax3 from "markdown-it-mathjax3";
 import md from "markdown-it";
 import Clipboard from "clipboard";
 import { useDispatch, useSelector } from "react-redux";
+import { useOcrStore } from "@src/contentScripts/zustand/store";
 import styles from "./styles.less";
 import mdStyles from "./mackdown.less";
 
@@ -58,9 +59,7 @@ try {
 
 export const OcrOutput = () => {
     const dispatch = useDispatch();
-    const taskId = useSelector((state: any) => state.ocr.taskId);
-    const resultInputValue = useSelector((state: any) => state.ocr.resultInputValue);
-
+    const { ocrInputValue, taskId, setOcrInputValue } = useOcrStore();
     const [downloadLoading, setDownloadLoading] = useState(false);
 
     useEffect(() => {
@@ -74,14 +73,11 @@ export const OcrOutput = () => {
     }, []);
 
     useEffect(() => {
-        getMdResult(resultInputValue);
-    }, [resultInputValue]);
+        getMdResult(ocrInputValue);
+    }, [ocrInputValue]);
 
     const inputChange = (e: any) => {
-        dispatch({
-            type: "ocr/SET_RESULT_INPUT_VALUE",
-            payload: e.target.value,
-        });
+        setOcrInputValue(e.target.value);
     };
 
     const getMdResult = (value: string) => {
@@ -130,7 +126,7 @@ export const OcrOutput = () => {
                         <div
                             className={styles.actionButton}
                             id="copyAsin"
-                            data-clipboard-text={resultInputValue}
+                            data-clipboard-text={ocrInputValue}
                             title="Copy Content"
                         >
                             <svg
@@ -153,7 +149,7 @@ export const OcrOutput = () => {
 
                 <TextArea
                     className={styles.editorTextarea}
-                    value={resultInputValue}
+                    value={ocrInputValue}
                     onChange={inputChange}
                     placeholder=""
                 />

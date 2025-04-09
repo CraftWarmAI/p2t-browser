@@ -10,9 +10,9 @@ function quota(body: any) {
 function imgOcr(body: any) {
     return request(`/api/pix2text`, {
         method: "POST",
-        body: JSON.stringify(body),
+        body: body,
         headers: {
-            "Content-type": "multipart/form-data",
+            "Content-Type": "multipart/form-data",
         },
     });
 }
@@ -20,9 +20,9 @@ function imgOcr(body: any) {
 function imgOcrGpu(body: any) {
     return request(`/api-gpu/pix2text`, {
         method: "POST",
-        body: JSON.stringify(body),
+        body: body,
         headers: {
-            "Content-type": "multipart/form-data",
+            "Content-Type": "multipart/form-data",
         },
     });
 }

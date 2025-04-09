@@ -1,4 +1,5 @@
 declare module "*.module.css";
+declare module "images-quickly-compress";
 declare module "whatwg-fetch";
 declare module "*.less";
 declare module "*.json";
