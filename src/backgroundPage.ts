@@ -2,12 +2,14 @@ import browser from "webextension-polyfill";
 import services from "@src/services/ocr";
 import { getQuota } from "@src/redux/actions/ocr";
 import { getToken } from "@src/utils/cookie";
+import { store } from "@src/redux/store";
+import { wrapStore } from "webext-redux";
 
-import { store } from "@src/redux";
-import { createWrapStore } from "webext-redux";
-
-createWrapStore()(store);
-
+try {
+    wrapStore(store);
+} catch (error) {
+    console.log(error);
+}
 init();
 
 browser.runtime.onInstalled.addListener((details) => {
@@ -99,10 +101,10 @@ function loadContentScripts() {
 async function init() {
     const token = await getToken();
     if (token) {
-        await store.dispatch({
+        store.dispatch({
             type: "userInfo/SET_TOKEN",
             payload: token,
         });
-        await getQuota(store)(true);
+        await getQuota(store);
     }
 }

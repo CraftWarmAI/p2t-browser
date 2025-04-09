@@ -8,22 +8,20 @@ import { message } from "antd";
 import { Provider } from "react-redux";
 import App from "./main";
 import { Store } from "webext-redux";
-
 const store = new Store();
 
 const { is_build, node_env } = process.env;
 let timer: any;
-let currentToken: string;
-init();
 
-async function init() {
+(async function () {
     await store.ready();
+    setToken();
     pageInit();
-}
+})();
 
 async function pageInit() {
     try {
-        setToken();
+        console.log("pageInit");
 
         // 获取body节点
         const node = document.getElementsByTagName("body")?.[0];
@@ -38,13 +36,16 @@ async function pageInit() {
         );
 
         // 快捷刷新
+        let reloadId: string;
         if (!is_build) {
-            render(node, <Reload />);
+            reloadId = render(node, <Reload />);
         }
 
         // 监听href更新，重新加载组件
         hrefChange(async () => {
             delReactDom(extId);
+            if (reloadId) delReactDom(reloadId);
+            if (timer) clearInterval(timer);
             return pageInit();
         });
     } catch (error) {
@@ -54,28 +55,35 @@ async function pageInit() {
 
 function setToken() {
     const { href, search } = window.location;
+    let currentToken: string;
+
     if (
         href.indexOf(`p2t${node_env === "dev" ? "-dev" : ""}.breezedeus.com`) > 0 &&
         search.indexOf("event=login") > 0
     ) {
         if (timer) clearInterval(timer);
         timer = setInterval(async () => {
-            if (store.getState().userInfo.logined) {
+            if (await store.getState().userInfo.logined) {
                 return clearInterval(timer);
             }
             const token = document.getElementById("ext_login")?.innerHTML || "";
-            if (currentToken !== token) {
+            if (currentToken !== token && token) {
                 currentToken = token;
                 store.dispatch({
                     type: "userInfo/SET_TOKEN",
                     payload: token,
                 });
-                const result = getQuota(store)();
+                const result = await getQuota();
                 if (Boolean(result)) {
-                    setTimeout(() => {
-                        message.success("login successfully");
-                    }, 2000);
+                    message.success("login successfully");
                     await browser.storage.local.set({ token });
+                    try {
+                        await browser.runtime.sendMessage({
+                            type: "openPopup",
+                        });
+                    } catch (error) {
+                        console.log("openPopup启动限制");
+                    }
                 }
             }
         }, 2000);

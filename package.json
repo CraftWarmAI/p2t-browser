@@ -85,7 +85,6 @@
         "@types/mousetrap": "^1.6.15",
         "@types/react-redux": "7.1.24",
         "@types/react-router-dom": "5.1.8",
-        "@types/react-transition-group": "^4.4.12",
         "antd": "^5.0.7",
         "clipboard": "^2.0.11",
         "copy-webpack-plugin": "^11.0.0",
@@ -103,12 +102,12 @@
         "react-i18next": "^12.1.4",
         "react-redux": "7.2.9",
         "react-router-dom": "6.30.0",
-        "react-transition-group": "^4.4.5",
         "redux-thunk": "^2.4.2",
         "reset.css": "^2.0.2",
-        "webext-redux": "^4.0.0",
+        "webext-redux": "2.1.9",
         "webextension-polyfill": "^0.10.0",
-        "whatwg-fetch": "^3.6.2"
+        "whatwg-fetch": "^3.6.2",
+        "zustand": "^4.4.0"
     },
     "resolutions": {
         "@types/react": "17.0.2"

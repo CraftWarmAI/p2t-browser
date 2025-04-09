@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Button, message } from "antd";
 import { CloseOutlined, CheckOutlined } from "@ant-design/icons";
+import { useOcrStore } from "@src/contentScripts/zustand/store";
 import browser from "webextension-polyfill";
 import styles from "./component.less";
 import Mousetrap from "mousetrap";
@@ -13,7 +14,8 @@ interface SelectionArea {
     height: number;
 }
 
-const Screenshot: React.FC<{ onScreenshot: (arg0: File) => void }> = (props) => {
+const Screenshot: React.FC = () => {
+    const { setScreenshot } = useOcrStore();
     const logined = useSelector((state: any) => state.userInfo.logined);
     const [isSelecting, setIsSelecting] = useState<boolean>(false);
     const [selection, setSelection] = useState<SelectionArea>({
@@ -41,9 +43,23 @@ const Screenshot: React.FC<{ onScreenshot: (arg0: File) => void }> = (props) => 
     }, []);
 
     useEffect(() => {
-        function onMessage(params: SendMessage) {
+        async function onMessage(params: SendMessage) {
             if (params.type === "onCommand") {
-                captureScreenshot();
+                if (!logined) {
+                    message.warning("Please log in before using the P2T feature.");
+                    return await browser.runtime.sendMessage({
+                        type: "openPopup",
+                    });
+                }
+                try {
+                    const url = await browser.runtime.sendMessage({
+                        type: "captureScreenshot",
+                    });
+                    setBgImg(url);
+                    setIsSelecting(true);
+                } catch (e) {
+                    console.error(e);
+                }
             }
         }
 
@@ -52,24 +68,6 @@ const Screenshot: React.FC<{ onScreenshot: (arg0: File) => void }> = (props) => 
             browser.runtime.onMessage.removeListener(onMessage);
         };
     }, [logined]);
-
-    const captureScreenshot = async () => {
-        if (!logined) {
-            message.warning("Please log in before using the P2T feature.");
-            return await browser.runtime.sendMessage({
-                type: "openPopup",
-            });
-        }
-        try {
-            const url = await browser.runtime.sendMessage({
-                type: "captureScreenshot",
-            });
-            setBgImg(url);
-            setIsSelecting(true);
-        } catch (e) {
-            console.error(e);
-        }
-    };
 
     const handleMouseDown = (e: React.MouseEvent) => {
         if (!isSelecting || !selection) return;
@@ -203,7 +201,7 @@ const Screenshot: React.FC<{ onScreenshot: (arg0: File) => void }> = (props) => 
         if (selection) {
             try {
                 const newImg: File = await cropImage(bgImg, selection);
-                props.onScreenshot(newImg);
+                setScreenshot(newImg);
             } catch (e) {
                 console.error(e);
             }

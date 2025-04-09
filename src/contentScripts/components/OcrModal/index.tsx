@@ -3,16 +3,10 @@ import { Modal } from "antd";
 import { OcrInputParams } from "../OcrInputParams";
 import { OcrOutput } from "../OcrOutput";
 import styles from "./styles.less";
+import { useOcrStore } from "@src/contentScripts/zustand/store";
 
-interface Props {
-    ocrStatus: number;
-    screenshot: File | null;
-    openOcrOutputModal: boolean;
-    onCancelModal: () => void;
-}
-
-export const OcrModal: React.FC<Props> = (props) => {
-    const { ocrStatus, screenshot, openOcrOutputModal, onCancelModal } = props;
+export const OcrModal: React.FC = () => {
+    const { screenshot, openOcrOutputModal, ocrStatus, onCancelOcr } = useOcrStore();
     const [imgUrl, setImgUrl] = useState("");
 
     useEffect(() => {
@@ -30,11 +24,12 @@ export const OcrModal: React.FC<Props> = (props) => {
                 xxl: "1400px",
             }}
             open={openOcrOutputModal}
-            onCancel={() => onCancelModal()}
+            onCancel={() => onCancelOcr()}
             footer={null}
         >
-            {screenshot && <img className={styles.preview} src={imgUrl} alt="" />}
-            {ocrStatus === 0 && screenshot && <OcrInputParams />}
+            {openOcrOutputModal}
+            {imgUrl && <img className={styles.preview} src={imgUrl} alt="" />}
+            {ocrStatus === 0 && imgUrl && <OcrInputParams />}
 
             {ocrStatus !== 0 && <OcrOutput />}
         </Modal>

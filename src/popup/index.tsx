@@ -8,16 +8,22 @@ import { Provider } from "react-redux";
 
 const store = new Store();
 
-browser.tabs.query({ active: true, currentWindow: true }).then(async () => {
-    await store.ready();
-    const node = document.getElementById("popup");
+init();
 
-    if (node) {
-        ReactDOM.render(
-            <Provider store={store}>
-                <App />
-            </Provider>,
-            node,
-        );
-    }
-});
+browser.tabs.query({ active: true, currentWindow: true }).then(init);
+
+async function init() {
+    await store.ready();
+    setTimeout(() => {
+        const node = document.getElementById("popup");
+
+        if (node) {
+            ReactDOM.render(
+                <Provider store={store}>
+                    <App />
+                </Provider>,
+                node,
+            );
+        }
+    }, 0);
+}

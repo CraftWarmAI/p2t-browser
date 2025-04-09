@@ -9,5 +9,5 @@ export function hrefChange(fn: (href?: string) => void, durable = false) {
             }
             href = newHref;
         }
-    }, 200);
+    }, 300);
 }

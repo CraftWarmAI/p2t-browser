@@ -2,34 +2,39 @@ import React from "react";
 import { Select, Tag, Button } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { fileTypeItems, languages, models } from "@src/config/ocrParamsConfig";
+import { useOcrStore } from "@src/contentScripts/zustand/store";
 import styles from "./styles.less";
 
 export const OcrInputParams = () => {
     const dispatch = useDispatch();
-    const model = useSelector((state: any) => state.ocr.model);
-    const language = useSelector((state: any) => state.ocr.language);
-    const fileType = useSelector((state: any) => state.ocr.fileType);
-    const ocrStatus = useSelector((state: any) => state.ocr.ocrStatus);
-    const screenshot = useSelector((state: any) => state.ocr.screenshot);
+    const {
+        screenshot,
+        ocrStatus,
+        model,
+        language,
+        fileType,
+        setModel,
+        setLanguage,
+        setFileType,
+        onCancelOcr,
+        setOcrStatus,
+    } = useOcrStore();
     const quotaData = useSelector((state: any) => state.userInfo.quota);
 
     const handleChange = (value: string, key: string) => {
-        dispatch({
-            type: "ocr/SET_" + key,
-            payload: value,
-        });
+        let fn;
+        if (key === "MODEL") {
+            fn = setModel;
+        } else if (key === "LANGUAGE") {
+            fn = setLanguage;
+        } else if (key === "FILE_TYPE") {
+            fn = setFileType;
+        }
+        fn && fn(value);
     };
 
     const startOcr = () => {
-        dispatch({
-            type: "ocr/START_OCR",
-        });
-    };
-
-    const cancelOcr = () => {
-        dispatch({
-            type: "ocr/CANCEL_OCR",
-        });
+        setOcrStatus(1);
     };
 
     if (ocrStatus === 0 && screenshot) {
@@ -86,7 +91,7 @@ export const OcrInputParams = () => {
                     </div>
                 </div>
                 <div className={styles.footer}>
-                    <Button onClick={() => cancelOcr()}>Cancel</Button>
+                    <Button onClick={() => onCancelOcr()}>Cancel</Button>
                     <Button className={styles.confirmBtn} type="primary" onClick={() => startOcr()}>
                         Confirm
                     </Button>

@@ -29,21 +29,18 @@ const userInfoSlice = createSlice({
             };
             state.user = user;
             state.logined = true;
+            return state;
         },
         LOGOUT: (state) => {
             state.token = "";
             state.logined = false;
             state.quota = { ...initQuota };
             state.user = { ...initUser };
-        },
-        a: (state, action) => {
-            state.logined = action.payload;
+            return state;
         },
         SET_TOKEN: (state, action) => {
             state.token = action.payload;
-        },
-        RELOAD: (state, action) => {
-            return action.payload;
+            return state;
         },
     },
 });
