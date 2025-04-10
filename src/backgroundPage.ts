@@ -24,7 +24,7 @@ browser.runtime.onInstalled.addListener((details) => {
         }, 2000);
         loadContentScripts();
     } else if (details.reason === "update") {
-        // loadContentScripts();
+        loadContentScripts();
     }
 });
 
