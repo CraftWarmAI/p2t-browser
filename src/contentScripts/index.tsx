@@ -3,7 +3,7 @@ import { render, delReactDom } from "@src/utils/dom";
 import Reload from "./components/Reload";
 import browser from "webextension-polyfill";
 import { getQuota } from "@src/redux/actions/ocr";
-import { message, Modal } from "antd";
+import { Modal } from "antd";
 import { Provider } from "react-redux";
 import App from "./main";
 import { Store } from "webext-redux";
@@ -76,8 +76,8 @@ function setToken() {
                     payload: token,
                 });
                 const result = await getQuota();
-                if (result.ok) {
-                    loginSuccess()
+                if (result?.ok !== false) {
+                    loginSuccess();
                     await browser.storage.local.set({ token });
                 }
             }
@@ -85,8 +85,8 @@ function setToken() {
     }
 }
 
-
 function loginSuccess() {
+    console.log("loginSuccess");
     Modal.success({
         zIndex: 2147483647,
         title: "login successfully!",
@@ -98,5 +98,4 @@ function loginSuccess() {
             });
         },
     });
-
 }

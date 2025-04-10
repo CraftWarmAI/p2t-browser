@@ -11,22 +11,28 @@ try {
         portName: "p2t",
     });
 } catch (error) {
+    console.log("======== redux初始化模块 =========");
     console.log(error);
 }
 
 init();
 
-browser.runtime.onInstalled.addListener((details) => {
-    if (details.reason === "install") {
-        const timer = setTimeout(() => {
-            browser.action.openPopup();
-            clearTimeout(timer);
-        }, 2000);
-        loadContentScripts();
-    } else if (details.reason === "update" && process.env.node_env === "prod") {
-        loadContentScripts();
-    }
-});
+try {
+    browser.runtime.onInstalled.addListener((details) => {
+        if (details.reason === "install") {
+            loadContentScripts();
+            const timer = setTimeout(async () => {
+                await browser.action?.openPopup?.();
+                clearTimeout(timer);
+            }, 3000);
+        } else if (details.reason === "update" && process.env.node_env === "prod") {
+            loadContentScripts();
+        }
+    });
+} catch (error) {
+    console.log("======== Install模块 =========");
+    console.log(error);
+}
 
 try {
     browser.runtime.onMessage.addListener(async (params: SendMessage) => {
