@@ -1,7 +1,7 @@
 import React from "react";
 import browser from "webextension-polyfill";
 import styles from "./styles.less";
-import logoImg from "@src/assets/images/logo3.jpg";
+import logoImg from "@src/assets/images/logo3.png";
 import { Button, Typography, Space, Divider } from "antd";
 
 const { node_env } = process.env;

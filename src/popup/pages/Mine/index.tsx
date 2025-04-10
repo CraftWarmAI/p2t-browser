@@ -5,7 +5,7 @@ import { Card, Typography, Button, Space, Divider, message } from "antd";
 import { LikeOutlined, LogoutOutlined, EditOutlined } from "@ant-design/icons";
 import { logout } from "@src/redux/actions/ocr";
 import styles from "./styles.less";
-import logoImg from "@src/assets/images/logo3.jpg";
+import logoImg from "@src/assets/images/logo3.png";
 import { Store } from "webext-redux";
 
 const store = new Store();

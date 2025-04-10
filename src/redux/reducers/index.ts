@@ -1,7 +1,6 @@
 import { combineReducers } from "redux";
 import userInfo from "./userInfo";
-import ocr from "./ocr";
 
-const rootReducers = combineReducers({ userInfo, ocr });
+const rootReducers = combineReducers({ userInfo });
 
 export default rootReducers;
