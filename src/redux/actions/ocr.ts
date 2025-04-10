@@ -10,7 +10,7 @@ export const getQuota = async (queryStore?: any) => {
     }
     const token = store.getState().userInfo.token;
     if (!token) {
-        return false;
+        return { ok: false };
     }
     let result;
     const params = {
@@ -19,8 +19,11 @@ export const getQuota = async (queryStore?: any) => {
     if (queryStore) {
         try {
             result = await services.quota(params);
-        } catch {
-            result = false;
+        } catch (error: any) {
+            if ([401, 422].includes(error?.status)) {
+                await logout(store);
+            }
+            result = error;
         }
     } else {
         result = await browser.runtime.sendMessage({
@@ -31,13 +34,11 @@ export const getQuota = async (queryStore?: any) => {
             },
         });
     }
-    if (result) {
+    if (result?.ok !== false) {
         store.dispatch({
             type: "userInfo/LOGIN",
             payload: result,
         });
-    } else {
-        logout(store);
     }
     return result;
 };
@@ -49,6 +50,7 @@ export const logout = async (store: any) => {
             type: "userInfo/LOGOUT",
         });
     } catch (error) {
-        console.info(error);
+        console.log(error);
     }
+    return true;
 };

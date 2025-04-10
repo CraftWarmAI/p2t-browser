@@ -38,7 +38,7 @@ export const useOcrStore = create<OcrState>((set) => ({
     callId: null,
 
     setOrcLoading: (payload) => set((state) => ({ ...state, orcLoading: payload })),
-    setOcrInputValue: (payload) => set((state) => ({ ...state, resultInputValue: payload })),
+    setOcrInputValue: (payload) => set((state) => ({ ...state, ocrInputValue: payload })),
     setModel: (payload) => set((state) => ({ ...state, model: payload })),
     setLanguage: (payload) => set((state) => ({ ...state, language: payload })),
     setFileType: (payload) => set((state) => ({ ...state, fileType: payload })),

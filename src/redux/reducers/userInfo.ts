@@ -18,6 +18,16 @@ const userInfoSlice = createSlice({
         quota: { ...initQuota },
     },
     reducers: {
+        SET_QUERY: (state, action) => {
+            const { pro_quota, plus_quota, pro_expiry_date, plus_expiry_date } = action.payload;
+            state.quota = {
+                pro_quota,
+                plus_quota,
+                pro_expiry_date,
+                plus_expiry_date,
+            };
+            return state;
+        },
         LOGIN: (state, action) => {
             const { pro_quota, plus_quota, pro_expiry_date, plus_expiry_date, user } =
                 action.payload;

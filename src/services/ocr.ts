@@ -28,25 +28,22 @@ function imgOcrGpu(body: any) {
 }
 
 function getTaskResult(body: any) {
-    return request("/api/result/" + body.task_id, {
+    return request(`/api/result/${body.task_id}?session_id=${body.session_id}`, {
         method: "GET",
-        body: JSON.stringify(body),
     });
 }
 
 function getTaskResultGpu(body: any) {
-    return request("/api-gpu/result/" + body.task_id, {
+    return request(`/api-gpu/result/${body.task_id}?session_id=${body.session_id}`, {
         method: "GET",
-        body: JSON.stringify(body),
     });
 }
 
 function exportResult(body: any) {
     return request(
-        `/api/result/${body.taskId}/export`,
+        `/api/result/${body.taskId}/export?format=${body.format}&session_id=${body.session_id}`,
         {
             method: "GET",
-            body: JSON.stringify(body),
         },
         "blob",
     );
@@ -54,10 +51,9 @@ function exportResult(body: any) {
 
 function exportResultGpu(body: any) {
     return request(
-        `/api-gpu/result/${body.taskId}/export`,
+        `/api-gpu/result/${body.taskId}/export?format=${body.format}&session_id=${body.session_id}`,
         {
             method: "GET",
-            body: JSON.stringify(body),
         },
         "blob",
     );

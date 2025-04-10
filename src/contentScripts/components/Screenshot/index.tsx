@@ -16,7 +16,9 @@ interface SelectionArea {
 
 const Screenshot: React.FC = () => {
     const { setScreenshot } = useOcrStore();
-    const logined = useSelector((state: any) => state.userInfo.logined);
+    const logined = useSelector((state: any) => {
+        return state.userInfo.logined;
+    });
     const [isSelecting, setIsSelecting] = useState<boolean>(false);
     const [selection, setSelection] = useState<SelectionArea>({
         startX: -10,

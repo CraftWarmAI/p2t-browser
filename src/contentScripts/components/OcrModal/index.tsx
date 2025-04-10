@@ -64,14 +64,10 @@ export const OcrModal: React.FC = () => {
                     },
                 },
             });
-            if (result.status !== 200) throw result;
-            const { status_code, task_id } = result.data;
-            if (status_code === 200) {
-                getResult(task_id, model);
-                setTaskId(task_id);
-            } else {
-                throw result;
-            }
+            const { status_code, task_id, ok } = result;
+            if (ok === false || status_code !== 200) throw result;
+            getResult(task_id, model);
+            setTaskId(task_id);
         } catch (error) {
             console.log(error);
             setOrcLoading(false);
@@ -89,8 +85,8 @@ export const OcrModal: React.FC = () => {
                     },
                 },
             });
-            if (result.status !== 200) throw result;
-            const { status_code, results, plus_quota, status } = result.data;
+            if (result?.ok == false) throw result;
+            const { results, plus_quota, status } = result;
             if (status === "PROGRESS") {
                 const timer = setTimeout(() => {
                     getResult(taskId, modelType);
@@ -98,23 +94,26 @@ export const OcrModal: React.FC = () => {
                 }, 1000);
                 return;
             }
-            if (status_code !== 200) throw result;
-            // dispatch({
-            //     type: "userInfo/setQuota",
-            //     payload: result.data,
-            // });
+            dispatch({
+                type: "userInfo/setQuota",
+                payload: result,
+            });
             if (plus_quota <= 0 && modelType === "plus") {
                 Modal.warning({
+                    zIndex: 2147483647,
                     title: "Your Plus Quota is not enough.",
                     content: (
                         <>
-                            Visit our <a href="/pricing">Pricing</a> page to recharge.
+                            Visit our <a href="https://p2t.breezedeus.com/pricing">Pricing</a> page
+                            to recharge.
                         </>
                     ),
                     okText: "Learn More",
                     closable: true,
                     onOk: () => {
-                        window.location.href = "/pricing";
+                        browser.tabs.create({
+                            url: "https://p2t.breezedeus.com/pricing",
+                        });
                     },
                 });
             }

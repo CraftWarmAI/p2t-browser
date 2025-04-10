@@ -21,3 +21,26 @@ export function base64ToFile(base64String: string, filename: string, mimeType: s
     const fileBlob = new Blob(byteArrays, { type: mimeType || "image/png" });
     return new File([fileBlob], filename, { type: mimeType || "image/png" });
 }
+
+export function blobToBase64(blob: Blob) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = function () {
+            resolve(reader.result); // 返回 Base64 字符串
+        };
+        reader.onerror = function () {
+            reject(new Error("Failed to convert Blob to Base64"));
+        };
+        reader.readAsDataURL(blob); // 读取 Blob 为 Base64 编码的字符串
+    });
+}
+
+export function base64ToBlob(base64String: string, mimeType: string) {
+    const byteString = atob(base64String.split(",")[1]);
+    const arrayBuffer = new ArrayBuffer(byteString.length);
+    const uint8Array = new Uint8Array(arrayBuffer);
+    for (let i = 0; i < byteString.length; i++) {
+        uint8Array[i] = byteString.charCodeAt(i);
+    }
+    return new Blob([uint8Array], { type: mimeType });
+}

@@ -6,7 +6,9 @@ import App from "./main";
 import { Store } from "webext-redux";
 import { Provider } from "react-redux";
 
-const store = new Store();
+const store = new Store({
+    portName: "p2t",
+});
 
 init();
 

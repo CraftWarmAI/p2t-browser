@@ -8,7 +8,9 @@ import { message } from "antd";
 import { Provider } from "react-redux";
 import App from "./main";
 import { Store } from "webext-redux";
-const store = new Store();
+const store = new Store({
+    portName: "p2t",
+});
 
 const { is_build, node_env } = process.env;
 let timer: any;
@@ -21,8 +23,6 @@ let timer: any;
 
 async function pageInit() {
     try {
-        console.log("pageInit");
-
         // 获取body节点
         const node = document.getElementsByTagName("body")?.[0];
         if (!node) throw new Error("body节点不存在");
@@ -81,7 +81,7 @@ function setToken() {
                     payload: token,
                 });
                 const result = await getQuota();
-                if (Boolean(result)) {
+                if (result.ok) {
                     message.success("login successfully");
                     await browser.storage.local.set({ token });
                     try {

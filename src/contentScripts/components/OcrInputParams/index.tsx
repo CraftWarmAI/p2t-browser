@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import React from "react";
 import { Select, Tag, Button } from "antd";
 import { useDispatch, useSelector } from "react-redux";
@@ -51,16 +52,16 @@ export const OcrInputParams = () => {
                                 item.disabled = item.value === "plus" && quotaData.plus_quota <= 0;
                                 return item;
                             })}
-                            dropdownRender={(originNode) => {
-                                return (
-                                    <div className={styles.dropdownRender}>
-                                        <div>{originNode}</div>
-                                        <Tag className={styles.tag} color="#f50">
-                                            recharge
-                                        </Tag>
-                                    </div>
-                                );
-                            }}
+                        // dropdownRender={(originNode) => {
+                        //     return (
+                        //         <div className={styles.dropdownRender}>
+                        //             <div>{originNode}</div>
+                        //             <Tag className={styles.tag} color="#f50">
+                        //                 recharge
+                        //             </Tag>
+                        //         </div>
+                        //     );
+                        // }}
                         />
                     </div>
                     <div>

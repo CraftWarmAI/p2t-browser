@@ -1,16 +1,19 @@
 import browser from "webextension-polyfill";
 import services from "@src/services/ocr";
-import { getQuota } from "@src/redux/actions/ocr";
+import { getQuota, logout } from "@src/redux/actions/ocr";
 import { getToken } from "@src/utils/cookie";
 import { store } from "@src/redux/store";
 import { wrapStore } from "webext-redux";
-import { base64ToFile } from "@src/utils/fileConversion";
+import { base64ToFile, blobToBase64 } from "@src/utils/fileConversion";
 
 try {
-    wrapStore(store);
+    wrapStore(store, {
+        portName: "p2t",
+    });
 } catch (error) {
     console.log(error);
 }
+
 init();
 
 browser.runtime.onInstalled.addListener((details) => {
@@ -21,7 +24,7 @@ browser.runtime.onInstalled.addListener((details) => {
         }, 2000);
         loadContentScripts();
     } else if (details.reason === "update") {
-        loadContentScripts();
+        // loadContentScripts();
     }
 });
 
@@ -38,31 +41,10 @@ try {
         } else if (params.type === "commandsUpdate") {
             return browser.commands.update(params.data);
         } else if (params.type === "fetch") {
-            const { name, value = {}, type } = params.data;
-            const func: any = services[name as keyof typeof services];
-            try {
-                let newValue: any;
-                if (type === "formData") {
-                    newValue = new FormData();
-                    for (const key in value) {
-                        let item = value[key];
-                        if (key === "image") {
-                            item = base64ToFile(value[key], "ext.png", "image/png");
-                            console.log(item);
-                        }
-                        newValue.append(key, item);
-                    }
-                } else {
-                    newValue = value;
-                }
-                return await func(newValue);
-            } catch (err) {
-                console.log(err);
-                return false;
-            }
+            return await fetchBridge(params);
         }
 
-        return false;
+        // return false;
     });
 } catch (error) {
     console.log("======== bg通信模块 =========");
@@ -84,6 +66,44 @@ browser.commands.onCommand.addListener((command) => {
     });
 });
 
+async function fetchBridge(params: SendMessage) {
+    const { name, value = {}, type = "json" } = params.data;
+    const func: any = services[name as keyof typeof services];
+    try {
+        let newValue: any;
+        if (type === "formData") {
+            newValue = new FormData();
+            for (const key in value) {
+                let item = value[key];
+                if (key === "image") {
+                    item = base64ToFile(value[key], "ext.png", "image/png");
+                }
+                newValue.append(key, item);
+            }
+        } else {
+            newValue = value;
+        }
+        let result = await func(newValue);
+        if (["exportResultGpu", "exportResult"].includes(params.data.name)) {
+            result = blobToBase64(result);
+        }
+        return result;
+    } catch (error: any) {
+        if ([401, 422].includes(error?.status)) {
+            await logout(store);
+            browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
+                if (tabs.length > 0) {
+                    browser.tabs.sendMessage(tabs[0].id as number, {
+                        type: "message",
+                        data: "Login expired. Please sign in to continue.",
+                    });
+                }
+            });
+            browser.action.openPopup();
+        }
+        return error;
+    }
+}
 async function captureScreenshot(): Promise<string> {
     try {
         const url = await browser.tabs.captureVisibleTab(undefined, { format: "png" });

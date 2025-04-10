@@ -9,8 +9,11 @@
     "mackdown",
     "mathjax",
     "Mathpix",
+    "officedocument",
+    "openxmlformats",
     "persistor",
     "webext",
-    "webextension"
+    "webextension",
+    "wordprocessingml"
   ]
 }

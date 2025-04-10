@@ -6,7 +6,7 @@ const BASE_URL_MAP = {
 
 const node_env = process.env.node_env || "dev";
 
-export const request = async (url: string, params: RequestInit = {}, responseType = "json") => {
+export const request = async (url: string, params: any = {}, responseType = "json") => {
     const BASE_URL = BASE_URL_MAP[node_env as keyof typeof BASE_URL_MAP];
 
     if (params) {
@@ -14,6 +14,9 @@ export const request = async (url: string, params: RequestInit = {}, responseTyp
             "Content-Type": "application/json;charset=UTF-8",
             ...params.headers,
         };
+        if (params.headers["Content-Type"] === "multipart/form-data") {
+            delete params.headers["Content-Type"];
+        }
     }
     try {
         const response = await fetch(url.startsWith("http") ? url : BASE_URL + url, params);
@@ -21,7 +24,7 @@ export const request = async (url: string, params: RequestInit = {}, responseTyp
             if (responseType === "json") {
                 return Promise.resolve(response.json());
             } else if (responseType === "blob") {
-                return Promise.resolve(response.blob());
+                return Promise.resolve(await response.blob());
             }
 
             return Promise.resolve(response);
