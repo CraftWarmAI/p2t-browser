@@ -1,7 +1,7 @@
 // 基础请求地址
 const BASE_URL_MAP = {
     dev: "https://p2t-dev.breezedeus.com",
-    prod: "https://dev.breezedeus.com",
+    prod: "https://p2t.breezedeus.com",
 };
 
 const node_env = process.env.node_env || "dev";

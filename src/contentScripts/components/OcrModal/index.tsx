@@ -127,6 +127,7 @@ export const OcrModal: React.FC = () => {
 
     return (
         <Modal
+            zIndex={2147483647}
             title="Pix2Text"
             centered
             width={{

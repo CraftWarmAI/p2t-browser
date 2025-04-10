@@ -4,7 +4,11 @@ import { delToken } from "@src/utils/cookie";
 import { Store } from "webext-redux";
 
 export const getQuota = async (queryStore?: any) => {
-    const store = queryStore ? queryStore : new Store();
+    const store = queryStore
+        ? queryStore
+        : new Store({
+              portName: "p2t",
+          });
     if (!queryStore) {
         await store.ready();
     }

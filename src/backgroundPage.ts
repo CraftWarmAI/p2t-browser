@@ -23,7 +23,7 @@ browser.runtime.onInstalled.addListener((details) => {
             clearTimeout(timer);
         }, 2000);
         loadContentScripts();
-    } else if (details.reason === "update") {
+    } else if (details.reason === "update" && process.env.node_env === "prod") {
         loadContentScripts();
     }
 });
@@ -44,7 +44,7 @@ try {
             return await fetchBridge(params);
         }
 
-        // return false;
+        return false;
     });
 } catch (error) {
     console.log("======== bg通信模块 =========");
@@ -53,7 +53,7 @@ try {
 
 browser.commands.onCommand.addListener((command) => {
     browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
-        if (tabs.length > 0) {
+        if (tabs.length > 0 && tabs[0].status === "complete") {
             try {
                 browser.tabs.sendMessage(tabs[0].id as number, {
                     type: "onCommand",

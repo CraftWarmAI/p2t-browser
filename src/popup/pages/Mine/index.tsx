@@ -8,7 +8,9 @@ import styles from "./styles.less";
 import logoImg from "@src/assets/images/logo3.png";
 import { Store } from "webext-redux";
 
-const store = new Store();
+const store = new Store({
+    portName: "p2t",
+});
 
 const { Title, Text } = Typography;
 
