@@ -14,21 +14,27 @@ const store = new Store({
 });
 
 const { is_build, node_env } = process.env;
-let renderDomId: string;
-let appDomId: string;
+const renderDomId = "ext_p2t_reload_id";
+const appDomId = "ext_p2t_main_id";
 let timer: any;
 
 (async function () {
     await store.ready();
+    if (["interactive", "complete"].includes(document.readyState)) {
+        unload();
+        pageInit();
+    } else {
+        window.addEventListener("load", pageInit);
+    }
+
+    window.addEventListener("beforeunload", unload);
 })();
 
-window.addEventListener("load", pageInit);
-
-window.addEventListener("beforeunload", () => {
+function unload() {
     if (timer) clearInterval(timer);
-    if (appDomId) delReactDom(appDomId);
-    if (renderDomId) delReactDom(renderDomId);
-});
+    delReactDom(appDomId);
+    delReactDom(renderDomId);
+}
 
 async function pageInit() {
     try {
@@ -39,16 +45,17 @@ async function pageInit() {
         if (!node) throw new Error("body节点不存在");
 
         // 渲染组件
-        appDomId = render(
+        render(
             node,
             <Provider store={store}>
                 <App />
             </Provider>,
+            appDomId,
         );
 
         // 快捷刷新
         if (!is_build) {
-            renderDomId = render(node, <Reload />);
+            render(node, <Reload />, renderDomId);
         }
     } catch (error) {
         console.log(error);
@@ -68,7 +75,6 @@ function setToken() {
                 return clearInterval(timer);
             }
             const token = document.getElementById("ext_login")?.innerHTML || "";
-            console.log(token);
             if (currentToken !== token && token) {
                 currentToken = token;
                 store.dispatch({
@@ -86,13 +92,24 @@ function setToken() {
 }
 
 function loginSuccess() {
-    console.log("loginSuccess");
     Modal.success({
-        zIndex: 2147483647,
+        styles: {
+            mask: {
+                zIndex: 2147483647,
+            },
+            wrapper: {
+                zIndex: 2147483647,
+            },
+        },
         title: "login successfully!",
         content: "Set up your shortcut key in the extension window now!",
         okText: "Confirm",
         onOk: () => {
+            browser.runtime.sendMessage({
+                type: "openPopup",
+            });
+        },
+        onCancel: () => {
             browser.runtime.sendMessage({
                 type: "openPopup",
             });

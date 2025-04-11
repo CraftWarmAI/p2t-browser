@@ -47,6 +47,7 @@ const Screenshot: React.FC = () => {
     useEffect(() => {
         async function onMessage(params: SendMessage) {
             if (params.type === "onCommand") {
+                if (isSelecting) return false;
                 if (!logined) {
                     message.warning("Please log in before using the P2T feature.");
                     return await browser.runtime.sendMessage({
@@ -63,13 +64,14 @@ const Screenshot: React.FC = () => {
                     console.error(e);
                 }
             }
+            return false;
         }
 
         browser.runtime.onMessage.addListener(onMessage);
         return () => {
             browser.runtime.onMessage.removeListener(onMessage);
         };
-    }, [logined]);
+    }, [logined, isSelecting]);
 
     const handleMouseDown = (e: React.MouseEvent) => {
         if (!isSelecting || !selection) return;

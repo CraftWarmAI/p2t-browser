@@ -2,12 +2,12 @@ import React, { useEffect, useState } from "react";
 import { useOcrStore } from "@src/contentScripts/zustand/store";
 import browser from "webextension-polyfill";
 import { useDispatch, useSelector } from "react-redux";
-import { Modal } from "antd";
+import { Modal, message } from "antd";
 import { OcrInputParams } from "../OcrInputParams";
 import { OcrOutput } from "../OcrOutput";
 import styles from "./styles.less";
 import { fileToBase64 } from "@src/utils/fileConversion";
-import ImagesQuicklyCompress from "images-quickly-compress";
+import Compressor from "compressorjs";
 
 export const OcrModal: React.FC = () => {
     const dispatch = useDispatch();
@@ -37,13 +37,17 @@ export const OcrModal: React.FC = () => {
     }, [ocrStatus]);
 
     const imgQuality = (file: File) => {
-        const imageCompress = new ImagesQuicklyCompress({
-            size: "50kb",
-            imageType: file.type,
-            quality: 0.8,
-            orientation: true,
+        return new Promise((resolve, reject) => {
+            new Compressor(file, {
+                quality: 0.8,
+                success(result: File) {
+                    resolve(result);
+                },
+                error(err: Error) {
+                    reject(err);
+                },
+            });
         });
-        return imageCompress.compressor([file]);
     };
 
     const createOcrTask = async () => {
@@ -56,7 +60,7 @@ export const OcrModal: React.FC = () => {
                     type: "formData",
                     name: model === "plus" ? "imgOcrGpu" : "imgOcr",
                     value: {
-                        image: await fileToBase64(newFile[0]),
+                        image: await fileToBase64(newFile as File),
                         session_id: token,
                         language: language,
                         file_type: fileType,
@@ -71,6 +75,7 @@ export const OcrModal: React.FC = () => {
         } catch (error) {
             console.log(error);
             setOrcLoading(false);
+            message.error("please try again");
         }
     };
     const getResult = async (taskId: string, modelType: string) => {
@@ -100,7 +105,15 @@ export const OcrModal: React.FC = () => {
             });
             if (plus_quota <= 0 && modelType === "plus") {
                 Modal.warning({
-                    zIndex: 2147483647,
+                    getContainer: false,
+                    styles: {
+                        mask: {
+                            zIndex: 2147483647,
+                        },
+                        wrapper: {
+                            zIndex: 2147483647,
+                        },
+                    },
                     title: "Your Plus Quota is not enough.",
                     content: (
                         <>
@@ -127,7 +140,15 @@ export const OcrModal: React.FC = () => {
 
     return (
         <Modal
-            zIndex={2147483647}
+            getContainer={false}
+            styles={{
+                mask: {
+                    zIndex: 2147483647,
+                },
+                wrapper: {
+                    zIndex: 2147483647,
+                },
+            }}
             title="Pix2Text"
             centered
             width={{

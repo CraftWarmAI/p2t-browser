@@ -5,9 +5,12 @@ import ReactDOM from "react-dom";
  * @param node 插入node
  * @param reactDom  reactDOM
  */
-export function render(node: Element, reactDom: any) {
+export function render(
+    node: Element,
+    reactDom: any,
+    childNodeId = `ext_id_${Math.floor(Math.random() * 99999)}`,
+) {
     const childNode = document.createElement("div");
-    const childNodeId = `ext_id_${Math.floor(Math.random() * 99999)}`;
     childNode.setAttribute("id", childNodeId);
     ReactDOM.render(reactDom, childNode);
     node?.appendChild(childNode);
@@ -22,6 +25,9 @@ export function delReactDom(dom: string | Element, domType = "id") {
     let node;
     if (domType === "id") {
         node = document.getElementById(dom as string);
+    } else {
+        node = dom as Element;
     }
     if (node) ReactDOM.unmountComponentAtNode(node);
+    if (node) node.parentElement?.removeChild(node);
 }

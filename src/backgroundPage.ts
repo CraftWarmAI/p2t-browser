@@ -22,7 +22,7 @@ try {
         if (details.reason === "install") {
             loadContentScripts();
             const timer = setTimeout(async () => {
-                await browser.action?.openPopup?.();
+                await browser.action.openPopup();
                 clearTimeout(timer);
             }, 3000);
         } else if (details.reason === "update" && process.env.node_env === "prod") {

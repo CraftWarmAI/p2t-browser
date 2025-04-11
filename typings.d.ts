@@ -1,5 +1,4 @@
 declare module "*.module.css";
-declare module "images-quickly-compress";
 declare module "*.less";
 declare module "*.json";
 declare module "*.png";
