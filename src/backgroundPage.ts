@@ -25,7 +25,7 @@ try {
                 await browser.action.openPopup();
                 clearTimeout(timer);
             }, 3000);
-        } else if (details.reason === "update" && process.env.node_env === "prod") {
+        } else if (details.reason === "update" && process.env.is_build === "true") {
             loadContentScripts();
         }
     });
