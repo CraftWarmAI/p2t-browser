@@ -8,7 +8,7 @@
         "prod": "cross-env NODE_ENV=prod webpack -w --config ./config/webpack.dev.js",
         "dev:firefox": "cross-env BROWSER=firefox webpack -w --config ./config/webpack.dev.js",
         "prod:firefox": "cross-env NODE_ENV=prod BROWSER=firefox webpack -w --config ./config/webpack.dev.js",
-        "build": "yarn build:dev && yarn build:prod && yarn build:firefox_dev && yarn build:firefox_prod",
+        "build": "yarn build:dev && yarn build:prod",
         "build:dev": "cross-env BUILD=true webpack --config ./config/webpack.prod.js",
         "build:prod": "cross-env BUILD=true NODE_ENV=prod webpack --config ./config/webpack.prod.js",
         "build:firefox_dev": "cross-env BUILD=true BROWSER=firefox webpack --config ./config/webpack.prod.js",

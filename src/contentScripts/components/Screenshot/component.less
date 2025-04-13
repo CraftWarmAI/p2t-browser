@@ -11,7 +11,7 @@
     .bg {
         > div {
             position: absolute;
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.3);
         }
     }
 }
@@ -20,13 +20,14 @@
     position: absolute;
     border: 2px dashed rgba(#fff, 0.6);
     box-sizing: border-box;
-    cursor: pointer;
+    cursor: move;
 }
 
 .selectionControls {
     position: absolute;
     right: 4px;
     bottom: 4px;
+    z-index: 2147483647;
     display: inline-flex;
     gap: 6px;
     z-index: 2147483647;

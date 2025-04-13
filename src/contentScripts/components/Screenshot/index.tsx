@@ -204,7 +204,12 @@ const Screenshot: React.FC = () => {
     const handleConfirm = async () => {
         if (selection) {
             try {
-                const newImg: File = await cropImage(bgImg, selection);
+                const devicePixelRatio = window.devicePixelRatio;
+                const newImg: File = await cropImage(bgImg, {
+                    ...selection,
+                    startX: selection.startX * devicePixelRatio,
+                    startY: selection.startY * devicePixelRatio,
+                });
                 setScreenshot(newImg);
             } catch (e) {
                 console.error(e);
