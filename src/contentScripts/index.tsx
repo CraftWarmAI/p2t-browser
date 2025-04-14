@@ -7,13 +7,14 @@ import { Modal } from "antd";
 import { Provider } from "react-redux";
 import App from "./main";
 import { Store } from "webext-redux";
+import { createStore } from "@src/utils/store";
 import "./styles.less";
 
 const { is_build, node_env } = process.env;
 const renderDomId = "ext_p2t_reload_id";
 const appDomId = "ext_p2t_main_id";
 let timer: any;
-let store: any;
+let store: Store;
 
 (function () {
     if (["interactive", "complete"].includes(document.readyState)) {
@@ -34,11 +35,7 @@ function unload() {
 
 async function pageInit() {
     try {
-        store = new Store({
-            portName: "p2t",
-        });
-
-        await store.ready();
+        store = await createStore(200);
 
         setToken();
 

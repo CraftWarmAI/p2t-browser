@@ -6,11 +6,6 @@ import { LikeOutlined, LogoutOutlined, EditOutlined } from "@ant-design/icons";
 import { logout } from "@src/redux/actions/ocr";
 import styles from "./styles.less";
 import logoImg from "@src/assets/images/logo3.png";
-import { Store } from "webext-redux";
-
-const store = new Store({
-    portName: "p2t",
-});
 
 const { Title, Text } = Typography;
 
@@ -42,9 +37,13 @@ export const Mine = () => {
     };
 
     const handleLogout = async () => {
-        await store.ready();
-        logout(store);
-        message.success("Logged out!");
+        try {
+            await logout();
+            message.success("Logged out!");
+        } catch (error) {
+            console.log(error);
+            message.warning("please try again!");
+        }
     };
 
     const formatDate = (timestamp: number) => {

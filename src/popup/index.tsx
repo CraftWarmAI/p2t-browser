@@ -4,17 +4,15 @@ import browser from "webextension-polyfill";
 import App from "./main";
 import { Store } from "webext-redux";
 import { Provider } from "react-redux";
-
-const store = new Store({
-    portName: "p2t",
-});
+import { createStore } from "@src/utils/store";
 
 init();
 
 browser.tabs.query({ active: true, currentWindow: true }).then(init);
 
 async function init() {
-    await store.ready();
+    const store: Store = await createStore(100);
+
     setTimeout(() => {
         const node = document.getElementById("popup");
 

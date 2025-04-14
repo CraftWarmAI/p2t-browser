@@ -3,7 +3,7 @@ import services from "@src/services/ocr";
 import { getQuota, logout } from "@src/redux/actions/ocr";
 import { getToken } from "@src/utils/cookie";
 import { store } from "@src/redux/store";
-import { wrapStore } from "webext-redux";
+import { wrapStore, Store } from "webext-redux";
 import { base64ToFile, blobToBase64 } from "@src/utils/fileConversion";
 
 try {
@@ -96,7 +96,7 @@ async function fetchBridge(params: SendMessage) {
         return result;
     } catch (error: any) {
         if ([401, 422].includes(error?.status)) {
-            await logout(store);
+            await logout(store as Store);
             browser.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
                 if (tabs.length > 0) {
                     browser.tabs.sendMessage(tabs[0].id as number, {
@@ -140,6 +140,6 @@ async function init() {
             type: "userInfo/SET_TOKEN",
             payload: token,
         });
-        await getQuota(store);
+        await getQuota(store as Store);
     }
 }
