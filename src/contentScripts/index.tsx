@@ -9,17 +9,13 @@ import App from "./main";
 import { Store } from "webext-redux";
 import "./styles.less";
 
-const store = new Store({
-    portName: "p2t",
-});
-
 const { is_build, node_env } = process.env;
 const renderDomId = "ext_p2t_reload_id";
 const appDomId = "ext_p2t_main_id";
 let timer: any;
+let store: any;
 
-(async function () {
-    await store.ready();
+(function () {
     if (["interactive", "complete"].includes(document.readyState)) {
         unload();
         pageInit();
@@ -38,6 +34,12 @@ function unload() {
 
 async function pageInit() {
     try {
+        store = new Store({
+            portName: "p2t",
+        });
+
+        await store.ready();
+
         setToken();
 
         // 获取body节点

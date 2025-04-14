@@ -39,7 +39,7 @@ export const OcrModal: React.FC = () => {
     const imgQuality = (file: File) => {
         return new Promise((resolve, reject) => {
             new Compressor(file, {
-                quality: 0.8,
+                quality: 0.9,
                 success(result: File) {
                     resolve(result);
                 },
