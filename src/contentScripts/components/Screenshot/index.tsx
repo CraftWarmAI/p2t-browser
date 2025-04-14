@@ -206,7 +206,8 @@ const Screenshot: React.FC = () => {
             try {
                 const devicePixelRatio = window.devicePixelRatio;
                 const newImg: File = await cropImage(bgImg, {
-                    ...selection,
+                    width: selection.width * devicePixelRatio,
+                    height: selection.height * devicePixelRatio,
                     startX: selection.startX * devicePixelRatio,
                     startY: selection.startY * devicePixelRatio,
                 });
