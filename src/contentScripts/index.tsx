@@ -40,7 +40,7 @@ async function pageInit() {
         setToken();
 
         // 获取body节点
-        const node = document.getElementsByTagName("body")?.[0];
+        const node = document?.getElementsByTagName?.("body")?.[0];
         if (!node) throw new Error("body节点不存在");
 
         // 渲染组件
