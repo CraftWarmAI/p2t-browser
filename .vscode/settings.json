@@ -5,6 +5,8 @@
     "breezedeus",
     "chtml",
     "compressorjs",
+    "cropend",
+    "cropstart",
     "ixblex",
     "logined",
     "mackdown",
@@ -17,6 +19,7 @@
     "webext",
     "webextension",
     "wordprocessingml",
-    "xcrun"
+    "xcrun",
+    "zoomable"
   ]
 }
